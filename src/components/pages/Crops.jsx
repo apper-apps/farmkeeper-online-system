@@ -47,9 +47,9 @@ const Crops = () => {
       ])
       
       // Enrich crops with farm names
-      const enrichedCrops = cropsData.map(crop => ({
+const enrichedCrops = cropsData.map(crop => ({
         ...crop,
-        farmName: farmsData.find(farm => farm.Id === crop.farmId)?.name || "Unknown Farm"
+        farmName: farmsData.find(farm => farm.Id === crop.farmId)?.Name || "Unknown Farm"
       }))
       
       setCrops(enrichedCrops)
@@ -79,16 +79,16 @@ const Crops = () => {
       let result
       if (editingCrop) {
         result = await cropService.update(editingCrop.Id, cropData)
-        setCrops(crops.map(crop => crop.Id === editingCrop.Id ? {
+setCrops(crops.map(crop => crop.Id === editingCrop.Id ? {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.name || "Unknown Farm"
+          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
         } : crop))
         toast.success("Crop updated successfully!")
       } else {
         result = await cropService.create(cropData)
-        setCrops([...crops, {
+setCrops([...crops, {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.name || "Unknown Farm"
+          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
         }])
         toast.success("Crop added successfully!")
       }
@@ -102,8 +102,8 @@ const Crops = () => {
   const handleEdit = (crop) => {
     setEditingCrop(crop)
     setFormData({
-      farmId: crop.farmId,
-      name: crop.name,
+farmId: crop.farmId,
+      name: crop.Name,
       variety: crop.variety || "",
       plantingDate: crop.plantingDate.split('T')[0],
       expectedHarvestDate: crop.expectedHarvestDate.split('T')[0],
@@ -144,7 +144,7 @@ const Crops = () => {
   }
 
   const filteredCrops = crops.filter(crop => {
-    const matchesSearch = crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+const matchesSearch = crop.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          crop.variety?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          crop.farmName.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === "all" || crop.status === statusFilter
@@ -260,8 +260,8 @@ const Crops = () => {
                     onChange={(e) => setFormData({...formData, farmId: e.target.value})}
                   >
                     <option value="">Select a farm</option>
-                    {farms.map(farm => (
-                      <option key={farm.Id} value={farm.Id}>{farm.name}</option>
+{farms.map(farm => (
+                      <option key={farm.Id} value={farm.Id}>{farm.Name}</option>
                     ))}
                   </FormField>
 

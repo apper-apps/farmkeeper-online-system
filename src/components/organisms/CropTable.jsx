@@ -59,7 +59,7 @@ const CropTable = ({ crops, onEdit, onDelete, onViewTasks }) => {
                       <ApperIcon name={getStatusIcon(crop.status)} size={18} className="text-primary-600" />
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">{crop.name}</div>
+<div className="font-medium text-gray-900">{crop.Name}</div>
                       {crop.variety && (
                         <div className="text-sm text-gray-600">{crop.variety}</div>
                       )}

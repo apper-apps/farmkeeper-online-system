@@ -140,7 +140,7 @@ const Farms = () => {
   const handleEdit = (farm) => {
     setEditingFarm(farm)
     setFormData({
-      name: farm.name,
+name: farm.Name,
       location: farm.location,
       size: farm.size.toString(),
       sizeUnit: farm.sizeUnit
@@ -181,8 +181,8 @@ const resetForm = () => {
     resetForm()
   }
 
-  const filteredFarms = farms.filter(farm =>
-    farm.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+const filteredFarms = farms.filter(farm =>
+    farm.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     farm.location.toLowerCase().includes(searchTerm.toLowerCase())
   )
 

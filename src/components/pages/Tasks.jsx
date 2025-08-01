@@ -48,10 +48,10 @@ const Tasks = () => {
       ])
       
       // Enrich tasks with farm and crop names
-      const enrichedTasks = tasksData.map(task => ({
+const enrichedTasks = tasksData.map(task => ({
         ...task,
-        farmName: farmsData.find(farm => farm.Id === task.farmId)?.name || "Unknown Farm",
-        cropName: task.cropId ? cropsData.find(crop => crop.Id === task.cropId)?.name || "Unknown Crop" : null
+        farmName: farmsData.find(farm => farm.Id === task.farmId)?.Name || "Unknown Farm",
+        cropName: task.cropId ? cropsData.find(crop => crop.Id === task.cropId)?.Name || "Unknown Crop" : null
       }))
       
       setTasks(enrichedTasks)
@@ -82,18 +82,18 @@ const Tasks = () => {
       let result
       if (editingTask) {
         result = await taskService.update(editingTask.Id, { ...taskData, completed: editingTask.completed })
-        setTasks(tasks.map(task => task.Id === editingTask.Id ? {
+setTasks(tasks.map(task => task.Id === editingTask.Id ? {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.name || "Unknown Farm",
-          cropName: result.cropId ? crops.find(crop => crop.Id === result.cropId)?.name || "Unknown Crop" : null
+          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm",
+          cropName: result.cropId ? crops.find(crop => crop.Id === result.cropId)?.Name || "Unknown Crop" : null
         } : task))
         toast.success("Task updated successfully!")
       } else {
         result = await taskService.create(taskData)
-        setTasks([...tasks, {
+setTasks([...tasks, {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.name || "Unknown Farm",
-          cropName: result.cropId ? crops.find(crop => crop.Id === result.cropId)?.name || "Unknown Crop" : null
+          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm",
+          cropName: result.cropId ? crops.find(crop => crop.Id === result.cropId)?.Name || "Unknown Crop" : null
         }])
         toast.success("Task added successfully!")
       }
@@ -280,8 +280,8 @@ const Tasks = () => {
                       onChange={(e) => setFormData({...formData, farmId: e.target.value, cropId: ""})}
                     >
                       <option value="">Select a farm</option>
-                      {farms.map(farm => (
-                        <option key={farm.Id} value={farm.Id}>{farm.name}</option>
+{farms.map(farm => (
+                        <option key={farm.Id} value={farm.Id}>{farm.Name}</option>
                       ))}
                     </FormField>
 
@@ -293,8 +293,8 @@ const Tasks = () => {
                       disabled={!formData.farmId}
                     >
                       <option value="">Select a crop</option>
-                      {availableCrops.map(crop => (
-                        <option key={crop.Id} value={crop.Id}>{crop.name}</option>
+{availableCrops.map(crop => (
+                        <option key={crop.Id} value={crop.Id}>{crop.Name}</option>
                       ))}
                     </FormField>
 

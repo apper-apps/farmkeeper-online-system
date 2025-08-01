@@ -65,9 +65,9 @@ const [transactions, setTransactions] = useState([])
       ])
       
       // Enrich transactions with farm names
-      const enrichedTransactions = transactionsData.map(transaction => ({
+const enrichedTransactions = transactionsData.map(transaction => ({
         ...transaction,
-        farmName: farmsData.find(farm => farm.Id === transaction.farmId)?.name || "Unknown Farm"
+        farmName: farmsData.find(farm => farm.Id === transaction.farmId)?.Name || "Unknown Farm"
       }))
       
       setTransactions(enrichedTransactions)
@@ -97,16 +97,16 @@ const [transactions, setTransactions] = useState([])
       let result
       if (editingTransaction) {
         result = await transactionService.update(editingTransaction.Id, transactionData)
-        setTransactions(transactions.map(transaction => transaction.Id === editingTransaction.Id ? {
+setTransactions(transactions.map(transaction => transaction.Id === editingTransaction.Id ? {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.name || "Unknown Farm"
+          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
         } : transaction))
         toast.success("Transaction updated successfully!")
       } else {
         result = await transactionService.create(transactionData)
-        setTransactions([...transactions, {
+setTransactions([...transactions, {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.name || "Unknown Farm"
+          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
         }])
         toast.success("Transaction added successfully!")
       }
@@ -345,11 +345,11 @@ const typeCounts = {
       csvData.push(['DETAILED TRANSACTIONS'])
       csvData.push(['Date', 'Farm', 'Type', 'Category', 'Amount', 'Description'])
       
-      reportTransactions.forEach(transaction => {
+reportTransactions.forEach(transaction => {
         const farm = farms.find(f => f.Id === transaction.farmId)
         csvData.push([
           format(new Date(transaction.date), "yyyy-MM-dd"),
-          farm ? farm.name : 'Unknown Farm',
+          farm ? farm.Name : 'Unknown Farm',
           transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
           transaction.category,
           `$${parseFloat(transaction.amount).toFixed(2)}`,
@@ -488,11 +488,11 @@ const typeCounts = {
         doc.text('Detailed Transactions', 20, yPosition)
         yPosition += 10
         
-        const transactionTableData = reportTransactions.map(transaction => {
+const transactionTableData = reportTransactions.map(transaction => {
           const farm = farms.find(f => f.Id === transaction.farmId)
           return [
             format(new Date(transaction.date), "yyyy-MM-dd"),
-            farm ? farm.name : 'Unknown',
+            farm ? farm.Name : 'Unknown',
             transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
             transaction.category,
             `$${parseFloat(transaction.amount).toFixed(2)}`,
@@ -861,8 +861,8 @@ const typeCounts = {
                     onChange={(e) => setFormData({...formData, farmId: e.target.value})}
                   >
                     <option value="">Select a farm</option>
-                    {farms.map(farm => (
-                      <option key={farm.Id} value={farm.Id}>{farm.name}</option>
+{farms.map(farm => (
+                      <option key={farm.Id} value={farm.Id}>{farm.Name}</option>
                     ))}
                   </FormField>
 

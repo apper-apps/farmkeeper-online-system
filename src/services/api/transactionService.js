@@ -1,92 +1,299 @@
-import transactionsData from "@/services/mockData/transactions.json";
+const { ApperClient } = window.ApperSDK
 
-const STORAGE_KEY = "farmkeeper_transactions"
-
-const loadTransactions = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  return stored ? JSON.parse(stored) : [...transactionsData]
-}
-
-const saveTransactions = (transactions) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
-}
+const apperClient = new ApperClient({
+  apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+  apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+})
 
 const transactionService = {
   async getAll() {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    return loadTransactions()
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "type" } },
+          { field: { Name: "category" } },
+          { field: { Name: "amount" } },
+          { field: { Name: "date" } },
+          { field: { Name: "description" } },
+          { field: { Name: "farmId" } }
+        ]
+      }
+      
+      const response = await apperClient.fetchRecords('transaction', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      return response.data || []
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching transactions:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error fetching transactions:", error.message)
+        throw error
+      }
+    }
   },
 
   async getById(id) {
-    await new Promise(resolve => setTimeout(resolve, 200))
-    const transactions = loadTransactions()
-    const transaction = transactions.find(t => t.Id === parseInt(id))
-    if (!transaction) {
-      throw new Error("Transaction not found")
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "type" } },
+          { field: { Name: "category" } },
+          { field: { Name: "amount" } },
+          { field: { Name: "date" } },
+          { field: { Name: "description" } },
+          { field: { Name: "farmId" } }
+        ]
+      }
+      
+      const response = await apperClient.getRecordById('transaction', parseInt(id), params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      return response.data
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching transaction with ID ${id}:`, error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error(`Error fetching transaction with ID ${id}:`, error.message)
+        throw error
+      }
     }
-    return transaction
   },
 
   async getByFarmId(farmId) {
-    await new Promise(resolve => setTimeout(resolve, 250))
-    const transactions = loadTransactions()
-    return transactions.filter(t => t.farmId === parseInt(farmId))
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "type" } },
+          { field: { Name: "category" } },
+          { field: { Name: "amount" } },
+          { field: { Name: "date" } },
+          { field: { Name: "description" } },
+          { field: { Name: "farmId" } }
+        ],
+        where: [
+          {
+            FieldName: "farmId",
+            Operator: "EqualTo",
+            Values: [parseInt(farmId)]
+          }
+        ]
+      }
+      
+      const response = await apperClient.fetchRecords('transaction', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      return response.data || []
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching transactions by farm ID:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error fetching transactions by farm ID:", error.message)
+        throw error
+      }
+    }
   },
 
   async create(transactionData) {
-    await new Promise(resolve => setTimeout(resolve, 400))
-    const transactions = loadTransactions()
-    const maxId = transactions.length > 0 ? Math.max(...transactions.map(t => t.Id)) : 0
-    const newTransaction = {
-      ...transactionData,
-      Id: maxId + 1,
-      farmId: parseInt(transactionData.farmId)
+    try {
+      // Only include Updateable fields
+      const params = {
+        records: [{
+          Name: transactionData.Name || transactionData.description,
+          Tags: transactionData.Tags || "",
+          Owner: transactionData.Owner,
+          type: transactionData.type,
+          category: transactionData.category,
+          amount: parseFloat(transactionData.amount),
+          date: transactionData.date,
+          description: transactionData.description,
+          farmId: parseInt(transactionData.farmId)
+        }]
+      }
+      
+      const response = await apperClient.createRecord('transaction', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success)
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create transaction ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+          throw new Error(failedRecords[0].message || "Failed to create transaction")
+        }
+        
+        return response.results[0].data
+      }
+      
+      return response.data
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating transaction:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error creating transaction:", error.message)
+        throw error
+      }
     }
-    const updatedTransactions = [...transactions, newTransaction]
-    saveTransactions(updatedTransactions)
-    return newTransaction
   },
 
   async update(id, transactionData) {
-    await new Promise(resolve => setTimeout(resolve, 400))
-    const transactions = loadTransactions()
-    const index = transactions.findIndex(t => t.Id === parseInt(id))
-    if (index === -1) {
-      throw new Error("Transaction not found")
+    try {
+      // Only include Updateable fields
+      const params = {
+        records: [{
+          Id: parseInt(id),
+          Name: transactionData.Name || transactionData.description,
+          Tags: transactionData.Tags || "",
+          Owner: transactionData.Owner,
+          type: transactionData.type,
+          category: transactionData.category,
+          amount: parseFloat(transactionData.amount),
+          date: transactionData.date,
+          description: transactionData.description,
+          farmId: parseInt(transactionData.farmId)
+        }]
+      }
+      
+      const response = await apperClient.updateRecord('transaction', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success)
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to update transaction ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+          throw new Error(failedRecords[0].message || "Failed to update transaction")
+        }
+        
+        return response.results[0].data
+      }
+      
+      return response.data
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating transaction:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error updating transaction:", error.message)
+        throw error
+      }
     }
-    const updatedTransaction = { 
-      ...transactions[index], 
-      ...transactionData, 
-      Id: parseInt(id),
-      farmId: parseInt(transactionData.farmId)
-    }
-    transactions[index] = updatedTransaction
-    saveTransactions(transactions)
-    return updatedTransaction
   },
 
   async delete(id) {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    const transactions = loadTransactions()
-    const filteredTransactions = transactions.filter(t => t.Id !== parseInt(id))
-if (filteredTransactions.length === transactions.length) {
-      throw new Error("Transaction not found")
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      }
+      
+      const response = await apperClient.deleteRecord('transaction', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success)
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to delete transaction ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+          throw new Error(failedRecords[0].message || "Failed to delete transaction")
+        }
+      }
+      
+      return true
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting transaction:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error deleting transaction:", error.message)
+        throw error
+      }
     }
-    saveTransactions(filteredTransactions)
-    return true
   },
 
   async getByDateRange(startDate, endDate) {
-    await new Promise(resolve => setTimeout(resolve, 200))
-    const transactions = loadTransactions()
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    
-    return transactions.filter(transaction => {
-      const transactionDate = new Date(transaction.date)
-      return transactionDate >= start && transactionDate <= end
-    })
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "type" } },
+          { field: { Name: "category" } },
+          { field: { Name: "amount" } },
+          { field: { Name: "date" } },
+          { field: { Name: "description" } },
+          { field: { Name: "farmId" } }
+        ],
+        where: [
+          {
+            FieldName: "date",
+            Operator: "GreaterThanOrEqualTo",
+            Values: [startDate]
+          },
+          {
+            FieldName: "date",
+            Operator: "LessThanOrEqualTo",
+            Values: [endDate]
+          }
+        ]
+      }
+      
+      const response = await apperClient.fetchRecords('transaction', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      return response.data || []
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching transactions by date range:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error fetching transactions by date range:", error.message)
+        throw error
+      }
+    }
   }
 }
 
+export default transactionService
 export default transactionService
