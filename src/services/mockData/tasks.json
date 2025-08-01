@@ -1,0 +1,112 @@
+[
+  {
+    "Id": 1,
+    "farmId": 1,
+    "cropId": 1,
+    "title": "Inspect tomato plants for pests",
+    "type": "other",
+    "dueDate": "2024-12-20T00:00:00Z",
+    "completed": false,
+    "priority": "high",
+    "notes": "Check for hornworms and aphids, apply organic treatment if needed"
+  },
+  {
+    "Id": 2,
+    "farmId": 1,
+    "cropId": 2,
+    "title": "Water sweet corn field",
+    "type": "watering",
+    "dueDate": "2024-12-18T00:00:00Z",
+    "completed": true,
+    "priority": "medium",
+    "notes": "Deep watering needed due to hot weather forecast"
+  },
+  {
+    "Id": 3,
+    "farmId": 1,
+    "cropId": 3,
+    "title": "Harvest winter wheat",
+    "type": "harvesting",
+    "dueDate": "2024-12-22T00:00:00Z",
+    "completed": false,
+    "priority": "high",
+    "notes": "Weather window looks good for harvesting this week"
+  },
+  {
+    "Id": 4,
+    "farmId": 2,
+    "cropId": 4,
+    "title": "Apply nitrogen fertilizer to soybeans",
+    "type": "fertilizing",
+    "dueDate": "2024-12-19T00:00:00Z",
+    "completed": false,
+    "priority": "medium",
+    "notes": "Side-dress application at R1 growth stage"
+  },
+  {
+    "Id": 5,
+    "farmId": 2,
+    "cropId": 5,
+    "title": "Scout field corn for rootworm",
+    "type": "other",
+    "dueDate": "2024-12-21T00:00:00Z",
+    "completed": false,
+    "priority": "low",
+    "notes": "Check root health and look for adult beetle activity"
+  },
+  {
+    "Id": 6,
+    "farmId": 3,
+    "cropId": 6,
+    "title": "Thin carrot seedlings",
+    "type": "other",
+    "dueDate": "2024-12-17T00:00:00Z",
+    "completed": true,
+    "priority": "medium",
+    "notes": "Thin to 2 inches apart for optimal root development"
+  },
+  {
+    "Id": 7,
+    "farmId": 3,
+    "cropId": 7,
+    "title": "Apply fungicide to barley",
+    "type": "other",
+    "dueDate": "2024-12-23T00:00:00Z",
+    "completed": false,
+    "priority": "medium",
+    "notes": "Preventative treatment for head blight disease"
+  },
+  {
+    "Id": 8,
+    "farmId": 3,
+    "cropId": 8,
+    "title": "Check pumpkin vine health",
+    "type": "other",
+    "dueDate": "2024-12-24T00:00:00Z",
+    "completed": false,
+    "priority": "low",
+    "notes": "Look for signs of vine borers and powdery mildew"
+  },
+  {
+    "Id": 9,
+    "farmId": 1,
+    "cropId": null,
+    "title": "Repair irrigation system",
+    "type": "other",
+    "dueDate": "2024-12-25T00:00:00Z",
+    "completed": false,
+    "priority": "high",
+    "notes": "Fix broken sprinkler heads in section B"
+  },
+  {
+    "Id": 10,
+    "farmId": 2,
+    "cropId": null,
+    "title": "Clean and service combine harvester",
+    "type": "other",
+    "dueDate": "2024-12-26T00:00:00Z",
+    "completed": false,
+    "priority": "medium",
+    "notes": "Annual maintenance before harvest season"
+  }
+]

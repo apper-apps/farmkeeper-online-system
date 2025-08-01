@@ -1,0 +1,10 @@
+{
+  "temperature": 72,
+  "condition": "sunny",
+  "humidity": 65,
+  "windSpeed": 8,
+  "visibility": 10,
+  "pressure": 1013,
+  "location": "Default Location",
+  "lastUpdated": "2024-12-17T14:30:00Z"
+}

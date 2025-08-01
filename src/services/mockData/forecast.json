@@ -1,0 +1,42 @@
+[
+  {
+    "Id": 1,
+    "date": "2024-12-18T00:00:00Z",
+    "condition": "sunny",
+    "highTemp": 75,
+    "lowTemp": 52,
+    "precipitationChance": 10
+  },
+  {
+    "Id": 2,
+    "date": "2024-12-19T00:00:00Z",
+    "condition": "cloudy",
+    "highTemp": 68,
+    "lowTemp": 48,
+    "precipitationChance": 25
+  },
+  {
+    "Id": 3,
+    "date": "2024-12-20T00:00:00Z",
+    "condition": "rainy",
+    "highTemp": 62,
+    "lowTemp": 45,
+    "precipitationChance": 80
+  },
+  {
+    "Id": 4,
+    "date": "2024-12-21T00:00:00Z",
+    "condition": "cloudy",
+    "highTemp": 65,
+    "lowTemp": 47,
+    "precipitationChance": 40
+  },
+  {
+    "Id": 5,
+    "date": "2024-12-22T00:00:00Z",
+    "condition": "sunny",
+    "highTemp": 71,
+    "lowTemp": 49,
+    "precipitationChance": 15
+  }
+]

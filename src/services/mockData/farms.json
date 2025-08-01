@@ -1,0 +1,29 @@
+[
+  {
+    "Id": 1,
+    "name": "Green Valley Farm",
+    "location": "Riverside County, CA",
+    "size": 125.5,
+    "sizeUnit": "acres",
+    "createdAt": "2024-01-15T08:00:00Z",
+    "activeCrops": 3
+  },
+  {
+    "Id": 2,
+    "name": "Sunset Ridge Farm",
+    "location": "Lancaster County, PA",
+    "size": 87.2,
+    "sizeUnit": "acres", 
+    "createdAt": "2024-02-20T10:30:00Z",
+    "activeCrops": 2
+  },
+  {
+    "Id": 3,
+    "name": "Prairie View Ranch",
+    "location": "Whatcom County, WA",
+    "size": 245.8,
+    "sizeUnit": "acres",
+    "createdAt": "2024-03-10T14:15:00Z",
+    "activeCrops": 4
+  }
+]

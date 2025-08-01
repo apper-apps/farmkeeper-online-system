@@ -1,0 +1,110 @@
+[
+  {
+    "Id": 1,
+    "farmId": 1,
+    "type": "expense",
+    "category": "Seeds & Plants",
+    "amount": 1250.00,
+    "date": "2024-03-10T00:00:00Z",
+    "description": "Organic tomato seedlings and sweet corn seed"
+  },
+  {
+    "Id": 2,
+    "farmId": 1,
+    "type": "expense",
+    "category": "Fertilizer",
+    "amount": 875.50,
+    "date": "2024-04-05T00:00:00Z",
+    "description": "Organic compost and bone meal fertilizer"
+  },
+  {
+    "Id": 3,
+    "farmId": 1,
+    "type": "income",
+    "category": "Crop Sales",
+    "amount": 3200.00,
+    "date": "2024-07-15T00:00:00Z",
+    "description": "Farmers market sales - tomatoes and herbs"
+  },
+  {
+    "Id": 4,
+    "farmId": 2,
+    "type": "expense", 
+    "category": "Seeds & Plants",
+    "amount": 2100.00,
+    "date": "2024-04-20T00:00:00Z",
+    "description": "Soybean and field corn seed purchase"
+  },
+  {
+    "Id": 5,
+    "farmId": 2,
+    "type": "expense",
+    "category": "Fuel",
+    "amount": 650.75,
+    "date": "2024-05-15T00:00:00Z",
+    "description": "Diesel fuel for planting operations"
+  },
+  {
+    "Id": 6,
+    "farmId": 2,
+    "type": "income",
+    "category": "Government Subsidies",
+    "amount": 1800.00,
+    "date": "2024-06-01T00:00:00Z",
+    "description": "Conservation Reserve Program payment"
+  },
+  {
+    "Id": 7,
+    "farmId": 3,
+    "type": "expense",
+    "category": "Equipment",
+    "amount": 4500.00,
+    "date": "2024-02-28T00:00:00Z",
+    "description": "New irrigation system components"
+  },
+  {
+    "Id": 8,
+    "farmId": 3,
+    "type": "expense",
+    "category": "Labor",
+    "amount": 1200.00,
+    "date": "2024-06-10T00:00:00Z",
+    "description": "Seasonal workers for carrot harvest"
+  },
+  {
+    "Id": 9,
+    "farmId": 3,
+    "type": "income",
+    "category": "Crop Sales",
+    "amount": 2800.00,
+    "date": "2024-08-20T00:00:00Z",
+    "description": "Organic carrot sales to local restaurants"
+  },
+  {
+    "Id": 10,
+    "farmId": 1,
+    "type": "expense",
+    "category": "Utilities",
+    "amount": 325.00,
+    "date": "2024-11-15T00:00:00Z",
+    "description": "Electricity for greenhouse heating"
+  },
+  {
+    "Id": 11,
+    "farmId": 2,
+    "type": "income",
+    "category": "Crop Sales",
+    "amount": 5200.00,
+    "date": "2024-10-30T00:00:00Z",
+    "description": "Soybean harvest sales to grain elevator"
+  },
+  {
+    "Id": 12,
+    "farmId": 3,
+    "type": "expense",
+    "category": "Insurance",
+    "amount": 950.00,
+    "date": "2024-12-01T00:00:00Z",
+    "description": "Annual crop insurance premium"
+  }
+]

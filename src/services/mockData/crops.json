@@ -1,0 +1,90 @@
+[
+  {
+    "Id": 1,
+    "farmId": 1,
+    "name": "Organic Tomatoes",
+    "variety": "Cherokee Purple",
+    "plantingDate": "2024-03-15T00:00:00Z",
+    "expectedHarvestDate": "2024-07-15T00:00:00Z",
+    "status": "growing",
+    "area": 15.5,
+    "notes": "Heirloom variety with excellent flavor profile"
+  },
+  {
+    "Id": 2,
+    "farmId": 1,
+    "name": "Sweet Corn",
+    "variety": "Silver Queen",
+    "plantingDate": "2024-04-01T00:00:00Z",
+    "expectedHarvestDate": "2024-08-01T00:00:00Z",
+    "status": "growing",
+    "area": 45.0,
+    "notes": "High-yield variety suitable for direct market sales"
+  },
+  {
+    "Id": 3,
+    "farmId": 1,
+    "name": "Winter Wheat",
+    "variety": "Hard Red Winter",
+    "plantingDate": "2023-10-15T00:00:00Z",
+    "expectedHarvestDate": "2024-07-01T00:00:00Z",
+    "status": "ready",
+    "area": 65.0,
+    "notes": "Excellent protein content for bread making"
+  },
+  {
+    "Id": 4,
+    "farmId": 2,
+    "name": "Soybeans",
+    "variety": "Pioneer P22T41R",
+    "plantingDate": "2024-05-10T00:00:00Z",
+    "expectedHarvestDate": "2024-10-15T00:00:00Z",
+    "status": "planted",
+    "area": 42.2,
+    "notes": "Roundup Ready variety with high oil content"
+  },
+  {
+    "Id": 5,
+    "farmId": 2,
+    "name": "Field Corn",
+    "variety": "DeKalb DKC64-87",
+    "plantingDate": "2024-04-25T00:00:00Z",
+    "expectedHarvestDate": "2024-10-01T00:00:00Z",
+    "status": "growing",
+    "area": 45.0,
+    "notes": "High-yield dent corn for feed market"
+  },
+  {
+    "Id": 6,
+    "farmId": 3,
+    "name": "Organic Carrots",
+    "variety": "Nantes",
+    "plantingDate": "2024-03-20T00:00:00Z",
+    "expectedHarvestDate": "2024-07-20T00:00:00Z",
+    "status": "growing",
+    "area": 8.5,
+    "notes": "Sweet, tender variety perfect for fresh market"
+  },
+  {
+    "Id": 7,
+    "farmId": 3,
+    "name": "Spring Barley",
+    "variety": "Conlon",
+    "plantingDate": "2024-04-15T00:00:00Z",
+    "expectedHarvestDate": "2024-08-20T00:00:00Z",
+    "status": "growing",
+    "area": 125.0,
+    "notes": "Malting barley with excellent brewing characteristics"
+  },
+  {
+    "Id": 8,
+    "farmId": 3,
+    "name": "Pumpkins",
+    "variety": "Connecticut Field",
+    "plantingDate": "2024-05-30T00:00:00Z",
+    "expectedHarvestDate": "2024-10-31T00:00:00Z",
+    "status": "planted",
+    "area": 12.3,
+    "notes": "Classic jack-o'-lantern variety for Halloween market"
+  }
+]

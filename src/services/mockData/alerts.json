@@ -1,0 +1,18 @@
+[
+  {
+    "Id": 1,
+    "title": "Heavy Rain Warning",
+    "description": "Heavy rainfall expected with potential for flooding in low-lying areas. Take precautions to protect crops and equipment.",
+    "severity": "high",
+    "issuedAt": "2024-12-17T10:00:00Z",
+    "expiresAt": "2024-12-20T23:59:00Z"
+  },
+  {
+    "Id": 2,
+    "title": "High Wind Advisory", 
+    "description": "Strong winds up to 45 mph expected. Secure loose farm equipment and consider delaying spraying operations.",
+    "severity": "medium",
+    "issuedAt": "2024-12-17T12:00:00Z",
+    "expiresAt": "2024-12-19T18:00:00Z"
+  }
+]
