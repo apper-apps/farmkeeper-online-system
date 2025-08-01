@@ -31,12 +31,16 @@ export default {
           800: '#ff8f00',
           900: '#F57C00',
         },
-        surface: '#FFFFFF',
+surface: '#FFFFFF',
         background: '#F5F5F5',
         success: '#4CAF50',
         warning: '#FF9800',
         error: '#F44336',
         info: '#2196F3',
+        border: {
+          DEFAULT: '#E5E7EB',
+          border: '#E5E7EB',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
