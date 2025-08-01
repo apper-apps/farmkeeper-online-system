@@ -238,117 +238,133 @@ const Tasks = () => {
       )}
 
       {/* Add/Edit Form */}
-      <AnimatePresence>
+<AnimatePresence>
         {showForm && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="card p-6"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {editingTask ? "Edit Task" : "Add New Task"}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetForm}
-              >
-                <ApperIcon name="X" size={18} />
-              </Button>
-            </div>
+          <>
+            {/* Modal Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={resetForm}
+            />
+            
+            {/* Modal Dialog */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {editingTask ? "Edit Task" : "Add New Task"}
+                    </h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetForm}
+                    >
+                      <ApperIcon name="X" size={18} />
+                    </Button>
+                  </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <FormField
-                label="Farm *"
-                type="select"
-                value={formData.farmId}
-                onChange={(e) => setFormData({...formData, farmId: e.target.value, cropId: ""})}
-              >
-                <option value="">Select a farm</option>
-                {farms.map(farm => (
-                  <option key={farm.Id} value={farm.Id}>{farm.name}</option>
-                ))}
-              </FormField>
+                  <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <FormField
+                      label="Farm *"
+                      type="select"
+                      value={formData.farmId}
+                      onChange={(e) => setFormData({...formData, farmId: e.target.value, cropId: ""})}
+                    >
+                      <option value="">Select a farm</option>
+                      {farms.map(farm => (
+                        <option key={farm.Id} value={farm.Id}>{farm.name}</option>
+                      ))}
+                    </FormField>
 
-              <FormField
-                label="Crop (Optional)"
-                type="select"
-                value={formData.cropId}
-                onChange={(e) => setFormData({...formData, cropId: e.target.value})}
-                disabled={!formData.farmId}
-              >
-                <option value="">Select a crop</option>
-                {availableCrops.map(crop => (
-                  <option key={crop.Id} value={crop.Id}>{crop.name}</option>
-                ))}
-              </FormField>
+                    <FormField
+                      label="Crop (Optional)"
+                      type="select"
+                      value={formData.cropId}
+                      onChange={(e) => setFormData({...formData, cropId: e.target.value})}
+                      disabled={!formData.farmId}
+                    >
+                      <option value="">Select a crop</option>
+                      {availableCrops.map(crop => (
+                        <option key={crop.Id} value={crop.Id}>{crop.name}</option>
+                      ))}
+                    </FormField>
 
-              <FormField
-                label="Task Title *"
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="e.g., Water greenhouse tomatoes"
-              />
+                    <FormField
+                      label="Task Title *"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      placeholder="e.g., Water greenhouse tomatoes"
+                    />
 
-              <FormField
-                label="Task Type"
-                type="select"
-                value={formData.type}
-                onChange={(e) => setFormData({...formData, type: e.target.value})}
-              >
-                <option value="watering">Watering</option>
-                <option value="fertilizing">Fertilizing</option>
-                <option value="harvesting">Harvesting</option>
-                <option value="planting">Planting</option>
-                <option value="weeding">Weeding</option>
-                <option value="other">Other</option>
-              </FormField>
+                    <FormField
+                      label="Task Type"
+                      type="select"
+                      value={formData.type}
+                      onChange={(e) => setFormData({...formData, type: e.target.value})}
+                    >
+                      <option value="watering">Watering</option>
+                      <option value="fertilizing">Fertilizing</option>
+                      <option value="harvesting">Harvesting</option>
+                      <option value="planting">Planting</option>
+                      <option value="weeding">Weeding</option>
+                      <option value="other">Other</option>
+                    </FormField>
 
-              <FormField
-                label="Due Date *"
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-              />
+                    <FormField
+                      label="Due Date *"
+                      type="date"
+                      value={formData.dueDate}
+                      onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+                    />
 
-              <FormField
-                label="Priority"
-                type="select"
-                value={formData.priority}
-                onChange={(e) => setFormData({...formData, priority: e.target.value})}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </FormField>
+                    <FormField
+                      label="Priority"
+                      type="select"
+                      value={formData.priority}
+                      onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </FormField>
 
-              <div className="md:col-span-2 lg:col-span-3">
-                <FormField
-                  label="Notes"
-                  type="textarea"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  placeholder="Additional notes about this task..."
-                />
+                    <div className="md:col-span-2 lg:col-span-3">
+                      <FormField
+                        label="Notes"
+                        type="textarea"
+                        value={formData.notes}
+                        onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                        placeholder="Additional notes about this task..."
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 lg:col-span-3 flex gap-3">
+                      <Button type="submit" className="flex-1 sm:flex-none">
+                        <ApperIcon name={editingTask ? "Save" : "Plus"} size={18} />
+                        {editingTask ? "Update Task" : "Add Task"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={resetForm}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               </div>
-
-              <div className="md:col-span-2 lg:col-span-3 flex gap-3">
-                <Button type="submit" className="flex-1 sm:flex-none">
-                  <ApperIcon name={editingTask ? "Save" : "Plus"} size={18} />
-                  {editingTask ? "Update Task" : "Add Task"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={resetForm}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
