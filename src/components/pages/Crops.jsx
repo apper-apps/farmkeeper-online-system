@@ -217,115 +217,130 @@ const Crops = () => {
         />
       )}
 
-      {/* Add/Edit Form */}
+{/* Add/Edit Modal */}
       <AnimatePresence>
         {showForm && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="card p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                resetForm()
+              }
+            }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {editingCrop ? "Edit Crop" : "Add New Crop"}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetForm}
-              >
-                <ApperIcon name="X" size={18} />
-              </Button>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    {editingCrop ? "Edit Crop" : "Add New Crop"}
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetForm}
+                  >
+                    <ApperIcon name="X" size={20} />
+                  </Button>
+                </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <FormField
-                label="Farm *"
-                type="select"
-                value={formData.farmId}
-                onChange={(e) => setFormData({...formData, farmId: e.target.value})}
-              >
-                <option value="">Select a farm</option>
-                {farms.map(farm => (
-                  <option key={farm.Id} value={farm.Id}>{farm.name}</option>
-                ))}
-              </FormField>
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <FormField
+                    label="Farm *"
+                    type="select"
+                    value={formData.farmId}
+                    onChange={(e) => setFormData({...formData, farmId: e.target.value})}
+                  >
+                    <option value="">Select a farm</option>
+                    {farms.map(farm => (
+                      <option key={farm.Id} value={farm.Id}>{farm.name}</option>
+                    ))}
+                  </FormField>
 
-              <FormField
-                label="Crop Name *"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="e.g., Corn, Wheat, Tomatoes"
-              />
+                  <FormField
+                    label="Crop Name *"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    placeholder="e.g., Corn, Wheat, Tomatoes"
+                  />
 
-              <FormField
-                label="Variety"
-                value={formData.variety}
-                onChange={(e) => setFormData({...formData, variety: e.target.value})}
-                placeholder="e.g., Sweet Corn, Winter Wheat"
-              />
+                  <FormField
+                    label="Variety"
+                    value={formData.variety}
+                    onChange={(e) => setFormData({...formData, variety: e.target.value})}
+                    placeholder="e.g., Sweet Corn, Winter Wheat"
+                  />
 
-              <FormField
-                label="Planting Date *"
-                type="date"
-                value={formData.plantingDate}
-                onChange={(e) => setFormData({...formData, plantingDate: e.target.value})}
-              />
+                  <FormField
+                    label="Planting Date *"
+                    type="date"
+                    value={formData.plantingDate}
+                    onChange={(e) => setFormData({...formData, plantingDate: e.target.value})}
+                  />
 
-              <FormField
-                label="Expected Harvest Date *"
-                type="date"
-                value={formData.expectedHarvestDate}
-                onChange={(e) => setFormData({...formData, expectedHarvestDate: e.target.value})}
-              />
+                  <FormField
+                    label="Expected Harvest Date *"
+                    type="date"
+                    value={formData.expectedHarvestDate}
+                    onChange={(e) => setFormData({...formData, expectedHarvestDate: e.target.value})}
+                  />
 
-              <FormField
-                label="Status"
-                type="select"
-                value={formData.status}
-                onChange={(e) => setFormData({...formData, status: e.target.value})}
-              >
-                <option value="planted">Planted</option>
-                <option value="growing">Growing</option>
-                <option value="ready">Ready</option>
-                <option value="harvested">Harvested</option>
-              </FormField>
+                  <FormField
+                    label="Status"
+                    type="select"
+                    value={formData.status}
+                    onChange={(e) => setFormData({...formData, status: e.target.value})}
+                  >
+                    <option value="planted">Planted</option>
+                    <option value="growing">Growing</option>
+                    <option value="ready">Ready</option>
+                    <option value="harvested">Harvested</option>
+                  </FormField>
 
-              <FormField
-                label="Area (acres) *"
-                type="number"
-                step="0.1"
-                min="0"
-                value={formData.area}
-                onChange={(e) => setFormData({...formData, area: e.target.value})}
-                placeholder="Enter area in acres"
-              />
+                  <FormField
+                    label="Area (acres) *"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={formData.area}
+                    onChange={(e) => setFormData({...formData, area: e.target.value})}
+                    placeholder="Enter area in acres"
+                  />
 
-              <div className="md:col-span-2 lg:col-span-2">
-                <FormField
-                  label="Notes"
-                  type="textarea"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  placeholder="Additional notes about this crop..."
-                />
+                  <div className="md:col-span-2 lg:col-span-2">
+                    <FormField
+                      label="Notes"
+                      type="textarea"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                      placeholder="Additional notes about this crop..."
+                    />
+                  </div>
+
+                  <div className="md:col-span-2 lg:col-span-3 flex gap-3 pt-4 border-t">
+                    <Button type="submit" className="flex-1 sm:flex-none">
+                      <ApperIcon name={editingCrop ? "Save" : "Plus"} size={18} />
+                      {editingCrop ? "Update Crop" : "Add Crop"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={resetForm}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
               </div>
-
-              <div className="md:col-span-2 lg:col-span-3 flex gap-3">
-                <Button type="submit" className="flex-1 sm:flex-none">
-                  <ApperIcon name={editingCrop ? "Save" : "Plus"} size={18} />
-                  {editingCrop ? "Update Crop" : "Add Crop"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={resetForm}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
