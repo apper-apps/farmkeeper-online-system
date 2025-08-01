@@ -1,4 +1,4 @@
-import transactionsData from "@/services/mockData/transactions.json"
+import transactionsData from "@/services/mockData/transactions.json";
 
 const STORAGE_KEY = "farmkeeper_transactions"
 
@@ -69,11 +69,23 @@ const transactionService = {
     await new Promise(resolve => setTimeout(resolve, 300))
     const transactions = loadTransactions()
     const filteredTransactions = transactions.filter(t => t.Id !== parseInt(id))
-    if (filteredTransactions.length === transactions.length) {
+if (filteredTransactions.length === transactions.length) {
       throw new Error("Transaction not found")
     }
     saveTransactions(filteredTransactions)
     return true
+  },
+
+  async getByDateRange(startDate, endDate) {
+    await new Promise(resolve => setTimeout(resolve, 200))
+    const transactions = loadTransactions()
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    
+    return transactions.filter(transaction => {
+      const transactionDate = new Date(transaction.date)
+      return transactionDate >= start && transactionDate <= end
+    })
   }
 }
 

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react"
 import { toast } from "react-toastify"
 import { motion, AnimatePresence } from "framer-motion"
-import { format, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns"
+import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfWeek, endOfWeek, subMonths, addMonths } from "date-fns"
+import jsPDF from "jspdf"
+import "jspdf-autotable"
+import Papa from "papaparse"
 import TransactionTable from "@/components/organisms/TransactionTable"
 import StatCard from "@/components/molecules/StatCard"
 import Button from "@/components/atoms/Button"
@@ -13,9 +16,8 @@ import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
 import transactionService from "@/services/api/transactionService"
 import farmService from "@/services/api/farmService"
-
 const Finance = () => {
-  const [transactions, setTransactions] = useState([])
+const [transactions, setTransactions] = useState([])
   const [farms, setFarms] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -24,6 +26,14 @@ const Finance = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [dateRange, setDateRange] = useState("all")
+  const [showReports, setShowReports] = useState(false)
+  const [reportPeriod, setReportPeriod] = useState("monthly")
+  const [reportFormat, setReportFormat] = useState("csv")
+  const [reportDateRange, setReportDateRange] = useState({
+    startDate: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+    endDate: format(endOfMonth(new Date()), "yyyy-MM-dd")
+  })
+  const [generatingReport, setGeneratingReport] = useState(false)
   const [formData, setFormData] = useState({
     farmId: "",
     type: "expense",
@@ -203,13 +213,362 @@ const Finance = () => {
 
   const { income, expenses, balance } = calculateStats()
 
-  const typeCounts = {
+const typeCounts = {
     all: transactions.length,
     income: transactions.filter(t => t.type === "income").length,
     expense: transactions.filter(t => t.type === "expense").length
   }
 
   const availableCategories = formData.type === "income" ? incomeCategories : expenseCategories
+
+  // Report Generation Functions
+  const getReportData = () => {
+    const startDate = new Date(reportDateRange.startDate)
+    const endDate = new Date(reportDateRange.endDate)
+    
+    return transactions.filter(transaction => {
+      const transactionDate = new Date(transaction.date)
+      return transactionDate >= startDate && transactionDate <= endDate
+    })
+  }
+
+  const generateReportSummary = (reportTransactions) => {
+    const income = reportTransactions.filter(t => t.type === "income")
+    const expenses = reportTransactions.filter(t => t.type === "expense")
+    
+    const totalIncome = income.reduce((sum, t) => sum + parseFloat(t.amount), 0)
+    const totalExpenses = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0)
+    const netProfit = totalIncome - totalExpenses
+    
+    // Category breakdown
+    const categoryBreakdown = {}
+    reportTransactions.forEach(transaction => {
+      const key = `${transaction.type}-${transaction.category}`
+      if (!categoryBreakdown[key]) {
+        categoryBreakdown[key] = {
+          type: transaction.type,
+          category: transaction.category,
+          amount: 0,
+          count: 0
+        }
+      }
+      categoryBreakdown[key].amount += parseFloat(transaction.amount)
+      categoryBreakdown[key].count += 1
+    })
+    
+    // Monthly breakdown if reporting period spans multiple months
+    const monthlyBreakdown = {}
+    if (reportPeriod === "monthly") {
+      reportTransactions.forEach(transaction => {
+        const monthKey = format(new Date(transaction.date), "yyyy-MM")
+        if (!monthlyBreakdown[monthKey]) {
+          monthlyBreakdown[monthKey] = { income: 0, expenses: 0, transactions: 0 }
+        }
+        if (transaction.type === "income") {
+          monthlyBreakdown[monthKey].income += parseFloat(transaction.amount)
+        } else {
+          monthlyBreakdown[monthKey].expenses += parseFloat(transaction.amount)
+        }
+        monthlyBreakdown[monthKey].transactions += 1
+      })
+    }
+    
+    return {
+      totalIncome,
+      totalExpenses,
+      netProfit,
+      transactionCount: reportTransactions.length,
+      categoryBreakdown: Object.values(categoryBreakdown),
+      monthlyBreakdown: Object.entries(monthlyBreakdown).map(([month, data]) => ({
+        month,
+        ...data,
+        netProfit: data.income - data.expenses
+      }))
+    }
+  }
+
+  const generateCSVReport = async () => {
+    setGeneratingReport(true)
+    try {
+      const reportTransactions = getReportData()
+      const summary = generateReportSummary(reportTransactions)
+      
+      // Prepare CSV data
+      const csvData = []
+      
+      // Add summary header
+      csvData.push(['FARM FINANCIAL REPORT'])
+      csvData.push(['Report Period:', `${reportDateRange.startDate} to ${reportDateRange.endDate}`])
+      csvData.push(['Generated:', format(new Date(), "yyyy-MM-dd HH:mm:ss")])
+      csvData.push([])
+      
+      // Add summary statistics
+      csvData.push(['SUMMARY'])
+      csvData.push(['Total Income:', `$${summary.totalIncome.toFixed(2)}`])
+      csvData.push(['Total Expenses:', `$${summary.totalExpenses.toFixed(2)}`])
+      csvData.push(['Net Profit/Loss:', `$${summary.netProfit.toFixed(2)}`])
+      csvData.push(['Total Transactions:', summary.transactionCount])
+      csvData.push([])
+      
+      // Add category breakdown
+      if (summary.categoryBreakdown.length > 0) {
+        csvData.push(['CATEGORY BREAKDOWN'])
+        csvData.push(['Type', 'Category', 'Amount', 'Transaction Count'])
+        summary.categoryBreakdown.forEach(cat => {
+          csvData.push([
+            cat.type.charAt(0).toUpperCase() + cat.type.slice(1),
+            cat.category,
+            `$${cat.amount.toFixed(2)}`,
+            cat.count
+          ])
+        })
+        csvData.push([])
+      }
+      
+      // Add monthly breakdown if available
+      if (summary.monthlyBreakdown.length > 0 && reportPeriod === "monthly") {
+        csvData.push(['MONTHLY BREAKDOWN'])
+        csvData.push(['Month', 'Income', 'Expenses', 'Net Profit', 'Transactions'])
+        summary.monthlyBreakdown.forEach(month => {
+          csvData.push([
+            format(new Date(month.month + '-01'), "MMM yyyy"),
+            `$${month.income.toFixed(2)}`,
+            `$${month.expenses.toFixed(2)}`,
+            `$${month.netProfit.toFixed(2)}`,
+            month.transactions
+          ])
+        })
+        csvData.push([])
+      }
+      
+      // Add detailed transactions
+      csvData.push(['DETAILED TRANSACTIONS'])
+      csvData.push(['Date', 'Farm', 'Type', 'Category', 'Amount', 'Description'])
+      
+      reportTransactions.forEach(transaction => {
+        const farm = farms.find(f => f.Id === transaction.farmId)
+        csvData.push([
+          format(new Date(transaction.date), "yyyy-MM-dd"),
+          farm ? farm.name : 'Unknown Farm',
+          transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
+          transaction.category,
+          `$${parseFloat(transaction.amount).toFixed(2)}`,
+          transaction.description || ''
+        ])
+      })
+      
+      // Generate and download CSV
+      const csv = Papa.unparse(csvData)
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `farm_report_${format(new Date(), "yyyy-MM-dd")}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      toast.success('CSV report generated and downloaded successfully!')
+    } catch (error) {
+      console.error('Error generating CSV report:', error)
+      toast.error('Failed to generate CSV report')
+    } finally {
+      setGeneratingReport(false)
+    }
+  }
+
+  const generatePDFReport = async () => {
+    setGeneratingReport(true)
+    try {
+      const reportTransactions = getReportData()
+      const summary = generateReportSummary(reportTransactions)
+      
+      const doc = new jsPDF()
+      let yPosition = 20
+      
+      // Title
+      doc.setFontSize(20)
+      doc.setFont("helvetica", "bold")
+      doc.text('Farm Financial Report', 20, yPosition)
+      yPosition += 15
+      
+      // Report details
+      doc.setFontSize(12)
+      doc.setFont("helvetica", "normal")
+      doc.text(`Report Period: ${reportDateRange.startDate} to ${reportDateRange.endDate}`, 20, yPosition)
+      yPosition += 8
+      doc.text(`Generated: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`, 20, yPosition)
+      yPosition += 15
+      
+      // Summary section
+      doc.setFontSize(16)
+      doc.setFont("helvetica", "bold")
+      doc.text('Summary', 20, yPosition)
+      yPosition += 10
+      
+      doc.setFontSize(12)
+      doc.setFont("helvetica", "normal")
+      doc.text(`Total Income: $${summary.totalIncome.toFixed(2)}`, 20, yPosition)
+      yPosition += 8
+      doc.text(`Total Expenses: $${summary.totalExpenses.toFixed(2)}`, 20, yPosition)
+      yPosition += 8
+      doc.text(`Net Profit/Loss: $${summary.netProfit.toFixed(2)}`, 20, yPosition)
+      yPosition += 8
+      doc.text(`Total Transactions: ${summary.transactionCount}`, 20, yPosition)
+      yPosition += 15
+      
+      // Category breakdown table
+      if (summary.categoryBreakdown.length > 0) {
+        doc.setFontSize(16)
+        doc.setFont("helvetica", "bold")
+        doc.text('Category Breakdown', 20, yPosition)
+        yPosition += 10
+        
+        const categoryTableData = summary.categoryBreakdown.map(cat => [
+          cat.type.charAt(0).toUpperCase() + cat.type.slice(1),
+          cat.category,
+          `$${cat.amount.toFixed(2)}`,
+          cat.count.toString()
+        ])
+        
+        doc.autoTable({
+          startY: yPosition,
+          head: [['Type', 'Category', 'Amount', 'Count']],
+          body: categoryTableData,
+          theme: 'striped',
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [124, 179, 66] }
+        })
+        
+        yPosition = doc.lastAutoTable.finalY + 15
+      }
+      
+      // Monthly breakdown if available
+      if (summary.monthlyBreakdown.length > 0 && reportPeriod === "monthly") {
+        if (yPosition > 200) {
+          doc.addPage()
+          yPosition = 20
+        }
+        
+        doc.setFontSize(16)
+        doc.setFont("helvetica", "bold")
+        doc.text('Monthly Breakdown', 20, yPosition)
+        yPosition += 10
+        
+        const monthlyTableData = summary.monthlyBreakdown.map(month => [
+          format(new Date(month.month + '-01'), "MMM yyyy"),
+          `$${month.income.toFixed(2)}`,
+          `$${month.expenses.toFixed(2)}`,
+          `$${month.netProfit.toFixed(2)}`,
+          month.transactions.toString()
+        ])
+        
+        doc.autoTable({
+          startY: yPosition,
+          head: [['Month', 'Income', 'Expenses', 'Net Profit', 'Transactions']],
+          body: monthlyTableData,
+          theme: 'striped',
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [124, 179, 66] }
+        })
+        
+        yPosition = doc.lastAutoTable.finalY + 15
+      }
+      
+      // Detailed transactions table
+      if (reportTransactions.length > 0) {
+        if (yPosition > 150) {
+          doc.addPage()
+          yPosition = 20
+        }
+        
+        doc.setFontSize(16)
+        doc.setFont("helvetica", "bold")
+        doc.text('Detailed Transactions', 20, yPosition)
+        yPosition += 10
+        
+        const transactionTableData = reportTransactions.map(transaction => {
+          const farm = farms.find(f => f.Id === transaction.farmId)
+          return [
+            format(new Date(transaction.date), "yyyy-MM-dd"),
+            farm ? farm.name : 'Unknown',
+            transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
+            transaction.category,
+            `$${parseFloat(transaction.amount).toFixed(2)}`,
+            (transaction.description || '').substring(0, 30) + ((transaction.description || '').length > 30 ? '...' : '')
+          ]
+        })
+        
+        doc.autoTable({
+          startY: yPosition,
+          head: [['Date', 'Farm', 'Type', 'Category', 'Amount', 'Description']],
+          body: transactionTableData,
+          theme: 'striped',
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [124, 179, 66] },
+          columnStyles: {
+            0: { cellWidth: 25 },
+            1: { cellWidth: 25 },
+            2: { cellWidth: 20 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 20 },
+            5: { cellWidth: 40 }
+          }
+        })
+      }
+      
+      // Save PDF
+      doc.save(`farm_report_${format(new Date(), "yyyy-MM-dd")}.pdf`)
+      toast.success('PDF report generated and downloaded successfully!')
+    } catch (error) {
+      console.error('Error generating PDF report:', error)
+      toast.error('Failed to generate PDF report')
+    } finally {
+      setGeneratingReport(false)
+    }
+  }
+
+  const handleGenerateReport = async () => {
+    if (reportFormat === "csv") {
+      await generateCSVReport()
+    } else {
+      await generatePDFReport()
+    }
+  }
+
+  const setQuickDateRange = (range) => {
+    const now = new Date()
+    let startDate, endDate
+    
+    switch (range) {
+      case "thisMonth":
+        startDate = startOfMonth(now)
+        endDate = endOfMonth(now)
+        break
+      case "lastMonth":
+        const lastMonth = subMonths(now, 1)
+        startDate = startOfMonth(lastMonth)
+        endDate = endOfMonth(lastMonth)
+        break
+      case "thisYear":
+        startDate = startOfYear(now)
+        endDate = endOfYear(now)
+        break
+      case "lastYear":
+        const lastYear = new Date(now.getFullYear() - 1, 0, 1)
+        startDate = startOfYear(lastYear)
+        endDate = endOfYear(lastYear)
+        break
+      default:
+        return
+    }
+    
+    setReportDateRange({
+      startDate: format(startDate, "yyyy-MM-dd"),
+      endDate: format(endDate, "yyyy-MM-dd")
+    })
+  }
 
   if (loading) return <Loading rows={8} />
   if (error) return <Error message={error} onRetry={loadData} />
@@ -310,6 +669,143 @@ const Finance = () => {
             </Button>
           </div>
         </div>
+      )}
+{/* Reports Section */}
+      {transactions.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-surface rounded-xl shadow-lg border border-gray-100 p-6 mb-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg">
+                <ApperIcon name="FileText" size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Generate Reports</h3>
+                <p className="text-sm text-gray-600">Download detailed financial reports</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowReports(!showReports)}
+              className="flex items-center gap-2"
+            >
+              <ApperIcon name={showReports ? "ChevronUp" : "ChevronDown"} size={16} />
+              {showReports ? "Hide" : "Show"} Options
+            </Button>
+          </div>
+
+          <AnimatePresence>
+            {showReports && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-6"
+              >
+                {/* Quick Date Range Buttons */}
+                <div>
+                  <label className="label-field">Quick Date Ranges</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { key: "thisMonth", label: "This Month" },
+                      { key: "lastMonth", label: "Last Month" },
+                      { key: "thisYear", label: "This Year" },
+                      { key: "lastYear", label: "Last Year" }
+                    ].map(range => (
+                      <Button
+                        key={range.key}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setQuickDateRange(range.key)}
+                        className="text-xs"
+                      >
+                        {range.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Report Configuration */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Date Range */}
+                  <div className="md:col-span-2">
+                    <label className="label-field">Custom Date Range</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="date"
+                        value={reportDateRange.startDate}
+                        onChange={(e) => setReportDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+                        className="input-field text-sm"
+                      />
+                      <input
+                        type="date"
+                        value={reportDateRange.endDate}
+                        onChange={(e) => setReportDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+                        className="input-field text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Report Period */}
+                  <div>
+                    <label className="label-field">Report Period</label>
+                    <select
+                      value={reportPeriod}
+                      onChange={(e) => setReportPeriod(e.target.value)}
+                      className="input-field"
+                    >
+                      <option value="monthly">Monthly Breakdown</option>
+                      <option value="summary">Summary Only</option>
+                    </select>
+                  </div>
+
+                  {/* Report Format */}
+                  <div>
+                    <label className="label-field">Format</label>
+                    <select
+                      value={reportFormat}
+                      onChange={(e) => setReportFormat(e.target.value)}
+                      className="input-field"
+                    >
+                      <option value="csv">CSV</option>
+                      <option value="pdf">PDF</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Generate Button */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                  <div className="text-sm text-gray-600">
+                    Report will include {getReportData().length} transactions from{" "}
+                    {format(new Date(reportDateRange.startDate), "MMM dd, yyyy")} to{" "}
+                    {format(new Date(reportDateRange.endDate), "MMM dd, yyyy")}
+                  </div>
+                  <Button 
+                    onClick={handleGenerateReport}
+                    disabled={generatingReport || getReportData().length === 0}
+                    className="flex items-center gap-2"
+                  >
+                    {generatingReport ? (
+                      <>
+                        <ApperIcon name="Loader2" size={16} className="animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <ApperIcon name="Download" size={16} />
+                        Generate {reportFormat.toUpperCase()} Report
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {/* Search */}
