@@ -820,101 +820,116 @@ const typeCounts = {
 
       {/* Add/Edit Form */}
       <AnimatePresence>
-        {showForm && (
+{showForm && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="card p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                resetForm();
+              }
+            }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetForm}
-              >
-                <ApperIcon name="X" size={18} />
-              </Button>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetForm}
+                  >
+                    <ApperIcon name="X" size={18} />
+                  </Button>
+                </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <FormField
-                label="Farm *"
-                type="select"
-                value={formData.farmId}
-                onChange={(e) => setFormData({...formData, farmId: e.target.value})}
-              >
-                <option value="">Select a farm</option>
-                {farms.map(farm => (
-                  <option key={farm.Id} value={farm.Id}>{farm.name}</option>
-                ))}
-              </FormField>
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <FormField
+                    label="Farm *"
+                    type="select"
+                    value={formData.farmId}
+                    onChange={(e) => setFormData({...formData, farmId: e.target.value})}
+                  >
+                    <option value="">Select a farm</option>
+                    {farms.map(farm => (
+                      <option key={farm.Id} value={farm.Id}>{farm.name}</option>
+                    ))}
+                  </FormField>
 
-              <FormField
-                label="Type *"
-                type="select"
-                value={formData.type}
-                onChange={(e) => setFormData({...formData, type: e.target.value, category: ""})}
-              >
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </FormField>
+                  <FormField
+                    label="Type *"
+                    type="select"
+                    value={formData.type}
+                    onChange={(e) => setFormData({...formData, type: e.target.value, category: ""})}
+                  >
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                  </FormField>
 
-              <FormField
-                label="Category *"
-                type="select"
-                value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
-              >
-                <option value="">Select a category</option>
-                {availableCategories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </FormField>
+                  <FormField
+                    label="Category *"
+                    type="select"
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  >
+                    <option value="">Select a category</option>
+                    {availableCategories.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </FormField>
 
-              <FormField
-                label="Amount *"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.amount}
-                onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                placeholder="Enter amount"
-              />
+                  <FormField
+                    label="Amount *"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                    placeholder="Enter amount"
+                  />
 
-              <FormField
-                label="Date *"
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({...formData, date: e.target.value})}
-              />
+                  <FormField
+                    label="Date *"
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                  />
 
-              <div className="md:col-span-1 lg:col-span-1">
-                <FormField
-                  label="Description *"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  placeholder="Brief description of the transaction"
-                />
+                  <div className="md:col-span-1 lg:col-span-1">
+                    <FormField
+                      label="Description *"
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      placeholder="Brief description of the transaction"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2 lg:col-span-3 flex gap-3">
+                    <Button type="submit" className="flex-1 sm:flex-none">
+                      <ApperIcon name={editingTransaction ? "Save" : "Plus"} size={18} />
+                      {editingTransaction ? "Update Transaction" : "Add Transaction"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={resetForm}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
               </div>
-
-              <div className="md:col-span-2 lg:col-span-3 flex gap-3">
-                <Button type="submit" className="flex-1 sm:flex-none">
-                  <ApperIcon name={editingTransaction ? "Save" : "Plus"} size={18} />
-                  {editingTransaction ? "Update Transaction" : "Add Transaction"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={resetForm}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
