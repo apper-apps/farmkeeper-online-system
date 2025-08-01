@@ -17,7 +17,7 @@ const cropService = {
           { field: { Name: "plantingDate" } },
           { field: { Name: "expectedHarvestDate" } },
           { field: { Name: "status" } },
-          { field: { Name: "area" } },
+{ field: { Name: "area" } },
           { field: { Name: "notes" } },
           { field: { Name: "farmId" } }
         ]

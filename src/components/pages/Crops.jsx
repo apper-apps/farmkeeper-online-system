@@ -46,10 +46,14 @@ const Crops = () => {
         farmService.getAll()
       ])
       
-      // Enrich crops with farm names
-const enrichedCrops = cropsData.map(crop => ({
+// Enrich crops with farm names
+      const enrichedCrops = cropsData.map(crop => ({
         ...crop,
-        farmName: farmsData.find(farm => farm.Id === crop.farmId)?.Name || "Unknown Farm"
+        farmName: farmsData.find(farm => {
+          // Handle lookup field (object) or direct ID (integer)
+          const cropFarmId = typeof crop.farmId === 'object' ? crop.farmId?.Id : crop.farmId
+          return farm.Id === cropFarmId
+        })?.Name || "Unknown Farm"
       }))
       
       setCrops(enrichedCrops)
@@ -81,14 +85,20 @@ const enrichedCrops = cropsData.map(crop => ({
         result = await cropService.update(editingCrop.Id, cropData)
 setCrops(crops.map(crop => crop.Id === editingCrop.Id ? {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
+          farmName: farms.find(farm => {
+            const resultFarmId = typeof result.farmId === 'object' ? result.farmId?.Id : result.farmId
+            return farm.Id === resultFarmId
+          })?.Name || "Unknown Farm"
         } : crop))
         toast.success("Crop updated successfully!")
       } else {
         result = await cropService.create(cropData)
 setCrops([...crops, {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
+          farmName: farms.find(farm => {
+            const resultFarmId = typeof result.farmId === 'object' ? result.farmId?.Id : result.farmId
+            return farm.Id === resultFarmId
+          })?.Name || "Unknown Farm"
         }])
         toast.success("Crop added successfully!")
       }
@@ -101,8 +111,8 @@ setCrops([...crops, {
 
   const handleEdit = (crop) => {
     setEditingCrop(crop)
-    setFormData({
-farmId: crop.farmId,
+setFormData({
+      farmId: typeof crop.farmId === 'object' ? crop.farmId?.Id : crop.farmId,
       name: crop.Name,
       variety: crop.variety || "",
       plantingDate: crop.plantingDate.split('T')[0],
