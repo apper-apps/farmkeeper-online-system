@@ -294,6 +294,4 @@ const transactionService = {
     }
   }
 }
-
-export default transactionService
 export default transactionService
