@@ -130,7 +130,7 @@ const handleEdit = (task) => {
       cropId: task.cropId || "",
       title: task.title,
       type: task.type,
-      dueDate: task.dueDate.split('T')[0],
+      dueDate: task.dueDate ? task.dueDate.split('T')[0] : "",
       priority: task.priority,
       status: task.status || "to do",
       notes: task.notes || ""

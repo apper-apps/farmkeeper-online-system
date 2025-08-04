@@ -13,11 +13,12 @@ const taskService = {
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "Owner" } },
-          { field: { Name: "title" } },
+{ field: { Name: "title" } },
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-{ field: { Name: "priority" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "status" } },
           { field: { Name: "notes" } },
           { 
             field: { Name: "farmId" },
@@ -56,11 +57,12 @@ const taskService = {
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "Owner" } },
-          { field: { Name: "title" } },
+{ field: { Name: "title" } },
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-{ field: { Name: "priority" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "status" } },
           { field: { Name: "notes" } },
           { 
             field: { Name: "farmId" },
@@ -100,12 +102,13 @@ const taskService = {
           { field: { Name: "Tags" } },
           { field: { Name: "Owner" } },
           { field: { Name: "title" } },
-          { field: { Name: "type" } },
+{ field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-{ field: { Name: "priority" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "status" } },
           { field: { Name: "notes" } },
-          { 
+          {
             field: { Name: "farmId" },
             referenceField: { field: { Name: "Name" } }
           },
@@ -151,9 +154,10 @@ const taskService = {
           { field: { Name: "Owner" } },
           { field: { Name: "title" } },
           { field: { Name: "type" } },
-          { field: { Name: "dueDate" } },
+{ field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-{ field: { Name: "priority" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "status" } },
           { field: { Name: "notes" } },
           { 
             field: { Name: "farmId" },
@@ -197,9 +201,9 @@ async create(taskData) {
       // Only include Updateable fields
       const params = {
         records: [{
-          Name: taskData.Name || taskData.title,
+Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
-          Owner: taskData.Owner?.Id || parseInt(taskData.Owner),
+          Owner: taskData.Owner?.Id || parseInt(taskData.Owner) || null,
           title: taskData.title,
           type: taskData.type || "other",
           dueDate: taskData.dueDate,
@@ -247,9 +251,9 @@ async update(id, taskData) {
       const params = {
         records: [{
           Id: parseInt(id),
-          Name: taskData.Name || taskData.title,
+Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
-          Owner: taskData.Owner?.Id || parseInt(taskData.Owner),
+          Owner: taskData.Owner?.Id || parseInt(taskData.Owner) || null,
           title: taskData.title,
           type: taskData.type,
           dueDate: taskData.dueDate,
