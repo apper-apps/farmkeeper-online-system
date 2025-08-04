@@ -35,7 +35,6 @@ const [formData, setFormData] = useState({
     status: "to do",
     notes: ""
   })
-
   useEffect(() => {
     loadData()
   }, [])
@@ -126,8 +125,8 @@ setTasks([...tasks, {
 const handleEdit = (task) => {
     setEditingTask(task)
     setFormData({
-      farmId: task.farmId,
-      cropId: task.cropId || "",
+      farmId: task.farmId?.Id || task.farmId || "",
+      cropId: task.cropId?.Id || task.cropId || "",
       title: task.title,
       type: task.type,
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : "",
@@ -152,8 +151,8 @@ const handleEdit = (task) => {
     }
   }
 
-  const resetForm = () => {
-setFormData({
+const resetForm = () => {
+    setFormData({
       farmId: "",
       cropId: "",
       title: "",
