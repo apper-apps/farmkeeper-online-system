@@ -22,6 +22,8 @@ const Crops = () => {
   const [editingCrop, setEditingCrop] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
   const [formData, setFormData] = useState({
     farmId: "",
     name: "",
@@ -152,8 +154,7 @@ setFormData({
     setEditingCrop(null)
     setShowForm(false)
   }
-
-  const filteredCrops = crops.filter(crop => {
+const filteredCrops = crops.filter(crop => {
 const matchesSearch = crop.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          crop.variety?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          crop.farmName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -161,6 +162,15 @@ const matchesSearch = crop.Name.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesSearch && matchesStatus
   })
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCrops.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedCrops = filteredCrops.slice(startIndex, startIndex + itemsPerPage)
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, statusFilter])
   const statusCounts = {
     all: crops.length,
     planted: crops.filter(c => c.status === "planted").length,
@@ -373,10 +383,15 @@ const matchesSearch = crop.Name.toLowerCase().includes(searchTerm.toLowerCase())
           </div>
         )
       ) : (
-        <CropTable
-          crops={filteredCrops}
+<CropTable
+          crops={paginatedCrops}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredCrops.length}
+          onPageChange={setCurrentPage}
         />
       )}
     </div>

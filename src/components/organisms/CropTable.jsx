@@ -4,7 +4,17 @@ import ApperIcon from "@/components/ApperIcon"
 import Badge from "@/components/atoms/Badge"
 import Button from "@/components/atoms/Button"
 
-const CropTable = ({ crops, onEdit, onDelete, onViewTasks }) => {
+const CropTable = ({ 
+  crops, 
+  onEdit, 
+  onDelete, 
+  onViewTasks, 
+  currentPage, 
+  totalPages, 
+  itemsPerPage, 
+  totalItems, 
+  onPageChange 
+}) => {
   const getStatusVariant = (status) => {
     switch (status) {
       case "planted":
@@ -32,6 +42,18 @@ const CropTable = ({ crops, onEdit, onDelete, onViewTasks }) => {
         return "Package"
       default:
         return "Sprout"
+    }
+  }
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1)
     }
   }
 
@@ -117,6 +139,39 @@ const CropTable = ({ crops, onEdit, onDelete, onViewTasks }) => {
           </tbody>
         </table>
       </div>
+      
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+          <div className="text-sm text-gray-600">
+            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} crops
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2"
+            >
+              <ApperIcon name="ChevronLeft" size={16} />
+              Previous
+            </Button>
+            <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">
+              Page {currentPage} of {totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2"
+            >
+              Next
+              <ApperIcon name="ChevronRight" size={16} />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
