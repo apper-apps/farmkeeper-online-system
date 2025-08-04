@@ -34,8 +34,9 @@ const [transactions, setTransactions] = useState([])
     endDate: format(endOfMonth(new Date()), "yyyy-MM-dd")
   })
   const [generatingReport, setGeneratingReport] = useState(false)
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     farmId: "",
+    Name: "",
     type: "expense",
     category: "",
     amount: "",
@@ -83,7 +84,7 @@ const enrichedTransactions = transactionsData.map(transaction => ({
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.farmId || !formData.category || !formData.amount || !formData.date || !formData.description) {
+if (!formData.farmId || !formData.Name || !formData.category || !formData.amount || !formData.date || !formData.description) {
       toast.error("Please fill in all required fields")
       return
     }
@@ -118,9 +119,10 @@ setTransactions([...transactions, {
   }
 
   const handleEdit = (transaction) => {
-    setEditingTransaction(transaction)
+setEditingTransaction(transaction)
     setFormData({
       farmId: transaction.farmId,
+      Name: transaction.Name || "",
       type: transaction.type,
       category: transaction.category,
       amount: transaction.amount.toString(),
@@ -145,8 +147,9 @@ setTransactions([...transactions, {
   }
 
   const resetForm = () => {
-    setFormData({
+setFormData({
       farmId: "",
+      Name: "",
       type: "expense",
       category: "",
       amount: "",
@@ -884,10 +887,17 @@ const transactionTableData = reportTransactions.map(transaction => {
                   >
                     <option value="">Select a category</option>
                     {availableCategories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+<option key={category} value={category}>{category}</option>
                     ))}
                   </FormField>
 
+                  <FormField
+                    label="Name *"
+                    type="text"
+                    value={formData.Name}
+                    onChange={(e) => setFormData({...formData, Name: e.target.value})}
+                    placeholder="Enter transaction name"
+                  />
                   <FormField
                     label="Amount *"
                     type="number"
