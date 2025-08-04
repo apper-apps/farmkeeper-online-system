@@ -52,8 +52,8 @@ const [farms, setFarms] = useState([])
       // Enrich tasks with farm and crop names
 const enrichedTasks = tasksData.map(task => ({
         ...task,
-        farmName: farmsData.find(farm => farm.Id === task.farmId)?.Name || "Unknown Farm",
-        cropName: task.cropId ? cropsData.find(crop => crop.Id === task.cropId)?.Name || "Unknown Crop" : null
+        farmName: task.farmId?.Name || farmsData.find(farm => farm.Id === (task.farmId?.Id || task.farmId))?.Name || "Unknown Farm",
+        cropName: task.cropId ? (task.cropId?.Name || cropsData.find(crop => crop.Id === (task.cropId?.Id || task.cropId))?.Name || "Unknown Crop") : null
       }))
       
       setTasks(enrichedTasks)
@@ -87,16 +87,16 @@ setFarms(farmsData)
         result = await taskService.update(editingTask.Id, { ...taskData, completed: editingTask.completed })
 setTasks(tasks.map(task => task.Id === editingTask.Id ? {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm",
-          cropName: result.cropId ? crops.find(crop => crop.Id === result.cropId)?.Name || "Unknown Crop" : null
+          farmName: result.farmId?.Name || farms.find(farm => farm.Id === (result.farmId?.Id || result.farmId))?.Name || "Unknown Farm",
+          cropName: result.cropId ? (result.cropId?.Name || crops.find(crop => crop.Id === (result.cropId?.Id || result.cropId))?.Name || "Unknown Crop") : null
         } : task))
         toast.success("Task updated successfully!")
       } else {
         result = await taskService.create(taskData)
 setTasks([...tasks, {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm",
-          cropName: result.cropId ? crops.find(crop => crop.Id === result.cropId)?.Name || "Unknown Crop" : null
+          farmName: result.farmId?.Name || farms.find(farm => farm.Id === (result.farmId?.Id || result.farmId))?.Name || "Unknown Farm",
+          cropName: result.cropId ? (result.cropId?.Name || crops.find(crop => crop.Id === (result.cropId?.Id || result.cropId))?.Name || "Unknown Crop") : null
         }])
         toast.success("Task added successfully!")
       }

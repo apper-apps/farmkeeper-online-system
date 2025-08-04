@@ -17,10 +17,16 @@ const taskService = {
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-          { field: { Name: "priority" } },
+{ field: { Name: "priority" } },
           { field: { Name: "notes" } },
-          { field: { Name: "farmId" } },
-          { field: { Name: "cropId" } }
+          { 
+            field: { Name: "farmId" },
+            referenceField: { field: { Name: "Name" } }
+          },
+          { 
+            field: { Name: "cropId" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ]
       }
       
@@ -54,10 +60,16 @@ const taskService = {
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-          { field: { Name: "priority" } },
+{ field: { Name: "priority" } },
           { field: { Name: "notes" } },
-          { field: { Name: "farmId" } },
-          { field: { Name: "cropId" } }
+          { 
+            field: { Name: "farmId" },
+            referenceField: { field: { Name: "Name" } }
+          },
+          { 
+            field: { Name: "cropId" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ]
       }
       
@@ -91,10 +103,16 @@ const taskService = {
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-          { field: { Name: "priority" } },
+{ field: { Name: "priority" } },
           { field: { Name: "notes" } },
-          { field: { Name: "farmId" } },
-          { field: { Name: "cropId" } }
+          { 
+            field: { Name: "farmId" },
+            referenceField: { field: { Name: "Name" } }
+          },
+          { 
+            field: { Name: "cropId" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ],
         where: [
           {
@@ -135,10 +153,16 @@ const taskService = {
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
-          { field: { Name: "priority" } },
+{ field: { Name: "priority" } },
           { field: { Name: "notes" } },
-          { field: { Name: "farmId" } },
-          { field: { Name: "cropId" } }
+          { 
+            field: { Name: "farmId" },
+            referenceField: { field: { Name: "Name" } }
+          },
+          { 
+            field: { Name: "cropId" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ],
         where: [
           {
