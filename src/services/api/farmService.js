@@ -72,13 +72,13 @@ if (!response.success) {
       }
 
       return response.data || []
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching farms:", error?.response?.data?.message)
       } else {
         console.error("Error fetching farms:", error.message)
       }
-      return []
+      throw error
     }
   },
 
@@ -132,12 +132,12 @@ if (!response.success) {
       
       return response.data
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error(`Error fetching farm with ID ${id}:`, error?.response?.data?.message)
       } else {
         console.error(`Error fetching farm with ID ${id}:`, error.message)
       }
-      return null
+      throw error
     }
   },
 
@@ -166,13 +166,13 @@ if (!response.success) {
       }
 
       return response.results?.[0]?.data
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error creating farm:", error?.response?.data?.message)
       } else {
         console.error("Error creating farm:", error.message)
       }
-      return null
+      throw error
     }
   },
 
@@ -202,12 +202,12 @@ if (!response.success) {
 
       return response.results?.[0]?.data
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error updating farm:", error?.response?.data?.message)
       } else {
         console.error("Error updating farm:", error.message)
       }
-      return null
+      throw error
     }
   },
 
@@ -220,12 +220,12 @@ if (!response.success) {
       const response = await apperClient.deleteRecord("farm", params)
       return response.success
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error deleting farm:", error?.response?.data?.message)
       } else {
         console.error("Error deleting farm:", error.message)
       }
-      return false
+      throw error
     }
   }
 }

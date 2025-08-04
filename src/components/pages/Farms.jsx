@@ -153,8 +153,7 @@ const handleDelete = async (farm) => {
     }
 
     try {
-      await farmService.delete(farm.Id)
-      await farmService.delete(farm.Id)
+await farmService.delete(farm.Id)
       setFarms(farms.filter(f => f.Id !== farm.Id))
       toast.success("Farm deleted successfully!")
     } catch (err) {
