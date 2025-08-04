@@ -1,21 +1,23 @@
-import { createContext, useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { ToastContainer } from "react-toastify"
-import { setUser, clearUser } from './store/userSlice'
-import Layout from "@/components/organisms/Layout"
-import Dashboard from "@/components/pages/Dashboard"
-import Farms from "@/components/pages/Farms"
-import Crops from "@/components/pages/Crops"
-import Tasks from "@/components/pages/Tasks"
-import Finance from "@/components/pages/Finance"
-import Weather from "@/components/pages/Weather"
-import Login from '@/components/pages/Login'
-import Signup from '@/components/pages/Signup'
-import Callback from '@/components/pages/Callback'
-import ErrorPage from '@/components/pages/ErrorPage'
-import ResetPassword from '@/components/pages/ResetPassword'
-import PromptPassword from '@/components/pages/PromptPassword'
+import React, { createContext, useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import Inventory from "@/components/pages/Inventory";
+import App from "@/index.css";
+import Layout from "@/components/organisms/Layout";
+import Finance from "@/components/pages/Finance";
+import Login from "@/components/pages/Login";
+import PromptPassword from "@/components/pages/PromptPassword";
+import Tasks from "@/components/pages/Tasks";
+import ResetPassword from "@/components/pages/ResetPassword";
+import Crops from "@/components/pages/Crops";
+import Farms from "@/components/pages/Farms";
+import Callback from "@/components/pages/Callback";
+import Dashboard from "@/components/pages/Dashboard";
+import ErrorPage from "@/components/pages/ErrorPage";
+import Signup from "@/components/pages/Signup";
+import Weather from "@/components/pages/Weather";
+import { clearUser, setUser } from "@/store/userSlice";
 
 // Create auth context
 export const AuthContext = createContext(null)
@@ -129,13 +131,14 @@ function AppContent() {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/prompt-password/:appId/:emailAddress/:provider" element={<PromptPassword />} />
         <Route path="/reset-password/:appId/:fields" element={<ResetPassword />} />
-        <Route path="/" element={<Layout />}>
+<Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="farms" element={<Farms />} />
           <Route path="crops" element={<Crops />} />
           <Route path="tasks" element={<Tasks />} />
           <Route path="finance" element={<Finance />} />
           <Route path="weather" element={<Weather />} />
+          <Route path="inventory" element={<Inventory />} />
         </Route>
       </Routes>
       <ToastContainer
