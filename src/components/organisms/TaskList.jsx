@@ -128,8 +128,7 @@ return (
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
-                >
+className={`p-4 rounded-lg transition-colors ${
                     task.completed 
                       ? "bg-green-50 border-green-200" 
                       : "bg-white border-gray-200 hover:border-primary-300 hover:shadow-md"
