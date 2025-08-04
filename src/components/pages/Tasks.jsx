@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from "react"
-import { toast } from "react-toastify"
-import { motion, AnimatePresence } from "framer-motion"
-import TaskList from "@/components/organisms/TaskList"
-import Button from "@/components/atoms/Button"
-import FormField from "@/components/molecules/FormField"
-import SearchBar from "@/components/molecules/SearchBar"
-import ApperIcon from "@/components/ApperIcon"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import taskService from "@/services/api/taskService"
-import farmService from "@/services/api/farmService"
-import cropService from "@/services/api/cropService"
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { AnimatePresence, motion } from "framer-motion";
+import cropService from "@/services/api/cropService";
+import taskService from "@/services/api/taskService";
+import farmService from "@/services/api/farmService";
+import ApperIcon from "@/components/ApperIcon";
+import SearchBar from "@/components/molecules/SearchBar";
+import FormField from "@/components/molecules/FormField";
+import TaskList from "@/components/organisms/TaskList";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Button from "@/components/atoms/Button";
+import Select from "@/components/atoms/Select";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([])
-  const [farms, setFarms] = useState([])
+const [farms, setFarms] = useState([])
   const [crops, setCrops] = useState([])
+  const [filteredCrops, setFilteredCrops] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [showForm, setShowForm] = useState(false)
@@ -55,8 +57,9 @@ const enrichedTasks = tasksData.map(task => ({
       }))
       
       setTasks(enrichedTasks)
-      setFarms(farmsData)
+setFarms(farmsData)
       setCrops(cropsData)
+      setFilteredCrops([])
     } catch (err) {
       setError("Failed to load tasks. Please try again.")
       toast.error("Failed to load tasks")
@@ -169,10 +172,29 @@ setTasks([...tasks, {
                          (statusFilter === "pending" && !task.completed) ||
                          (statusFilter === "completed" && task.completed)
     return matchesSearch && matchesStatus
-  })
+})
 
-  const availableCrops = crops.filter(crop => crop.farmId === formData.farmId)
+  // Effect to filter crops when farm is selected
+  useEffect(() => {
+    const fetchCropsForFarm = async () => {
+      if (formData.farmId) {
+        try {
+          const farmCrops = await cropService.getByFarmId(formData.farmId)
+          setFilteredCrops(farmCrops)
+        } catch (error) {
+          console.error("Error fetching crops for farm:", error.message)
+          setFilteredCrops([])
+        }
+      } else {
+        setFilteredCrops([])
+      }
+    }
+    
+    fetchCropsForFarm()
+  }, [formData.farmId])
 
+  // Calculate available crops based on selected farm
+  const availableCrops = formData.farmId ? filteredCrops : []
   const statusCounts = {
     all: tasks.length,
     pending: tasks.filter(t => !t.completed).length,
