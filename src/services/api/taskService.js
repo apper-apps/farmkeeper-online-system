@@ -192,14 +192,14 @@ const taskService = {
     }
   },
 
-  async create(taskData) {
+async create(taskData) {
     try {
       // Only include Updateable fields
       const params = {
         records: [{
           Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
-          Owner: taskData.Owner,
+          Owner: taskData.Owner?.Id || parseInt(taskData.Owner),
           title: taskData.title,
           type: taskData.type || "other",
           dueDate: taskData.dueDate,
@@ -241,7 +241,7 @@ const taskService = {
     }
   },
 
-  async update(id, taskData) {
+async update(id, taskData) {
     try {
       // Only include Updateable fields
       const params = {
@@ -249,7 +249,7 @@ const taskService = {
           Id: parseInt(id),
           Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
-          Owner: taskData.Owner,
+          Owner: taskData.Owner?.Id || parseInt(taskData.Owner),
           title: taskData.title,
           type: taskData.type,
           dueDate: taskData.dueDate,
