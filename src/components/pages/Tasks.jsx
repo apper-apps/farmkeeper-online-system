@@ -32,7 +32,7 @@ const [formData, setFormData] = useState({
     type: "watering",
     dueDate: "",
     priority: "medium",
-    status: "to do",
+    status: "TBD",
     notes: ""
   })
 
@@ -132,7 +132,7 @@ const handleEdit = (task) => {
       type: task.type,
       dueDate: task.dueDate.split('T')[0],
       priority: task.priority,
-      status: task.status || "to do",
+      status: task.status || "TBD",
       notes: task.notes || ""
     })
     setShowForm(true)
@@ -375,10 +375,7 @@ setFormData({
                       value={formData.status}
                       onChange={(e) => setFormData({...formData, status: e.target.value})}
                     >
-                      <option value="to do">To Do</option>
-                      <option value="in progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                      <option value="overdue">Overdue</option>
+                      <option value="TBD">TBD</option>
                     </FormField>
 
                     <div className="md:col-span-2 lg:col-span-3">
