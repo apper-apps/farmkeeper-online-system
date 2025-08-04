@@ -8,15 +8,15 @@ import ApperIcon from "@/components/ApperIcon";
 import SearchBar from "@/components/molecules/SearchBar";
 import FormField from "@/components/molecules/FormField";
 import TaskList from "@/components/organisms/TaskList";
+import PaginationControls from "@/components/molecules/PaginationControls";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
 import Button from "@/components/atoms/Button";
 import Select from "@/components/atoms/Select";
-
 const Tasks = () => {
   const [tasks, setTasks] = useState([])
-const [farms, setFarms] = useState([])
+  const [farms, setFarms] = useState([])
   const [crops, setCrops] = useState([])
   const [filteredCrops, setFilteredCrops] = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,6 +25,10 @@ const [farms, setFarms] = useState([])
   const [editingTask, setEditingTask] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(20)
 const [formData, setFormData] = useState({
     farmId: "",
     cropId: "",
@@ -166,7 +170,7 @@ const resetForm = () => {
     setShowForm(false)
   }
 
-  const filteredTasks = tasks.filter(task => {
+const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.farmName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (task.cropName && task.cropName.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -174,7 +178,30 @@ const resetForm = () => {
                          (statusFilter === "pending" && !task.completed) ||
                          (statusFilter === "completed" && task.completed)
     return matchesSearch && matchesStatus
-})
+  })
+
+  // Pagination calculations
+  const totalItems = filteredTasks.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedTasks = filteredTasks.slice(startIndex, endIndex)
+
+  // Reset to first page when search term or filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, statusFilter])
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    // Scroll to top of task list
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1) // Reset to first page
+  }
 
   // Effect to filter crops when farm is selected
   useEffect(() => {
@@ -411,7 +438,7 @@ const resetForm = () => {
         )}
       </AnimatePresence>
 
-      {/* Tasks List */}
+{/* Tasks List */}
       {filteredTasks.length === 0 ? (
         tasks.length === 0 ? (
           <Empty
@@ -429,12 +456,37 @@ const resetForm = () => {
           </div>
         )
       ) : (
-        <TaskList
-          tasks={filteredTasks}
-          onComplete={handleComplete}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <div className="space-y-6">
+          {/* Pagination Controls - Top */}
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+
+          {/* Task List */}
+          <TaskList
+            tasks={paginatedTasks}
+            onComplete={handleComplete}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+
+          {/* Pagination Controls - Bottom (only show if more than one page) */}
+          {totalPages > 1 && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          )}
+        </div>
       )}
     </div>
   )
