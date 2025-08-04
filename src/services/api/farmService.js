@@ -6,7 +6,7 @@ const apperClient = new ApperClient({
 })
 
 const farmService = {
-  async getAll() {
+async getAll(currentPage = null, itemsPerPage = null) {
     try {
       const params = {
         fields: [
@@ -22,21 +22,40 @@ const farmService = {
           { field: { Name: "sizeUnit" } },
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
-],
+        ],
         orderBy: [
           { fieldName: "CreatedOn", sorttype: "DESC" }
         ]
       }
 
+      // Add pagination if requested
+      if (currentPage && itemsPerPage) {
+        params.pagingInfo = {
+          limit: itemsPerPage,
+          offset: (currentPage - 1) * itemsPerPage
+        }
+      }
+
       const response = await apperClient.fetchRecords("farm", params)
       
-if (!response.success) {
+      if (!response.success) {
         console.error(response.message)
+        if (currentPage && itemsPerPage) {
+          return { data: [], total: 0 }
+        }
         return []
       }
 
+      // Return paginated response or simple array
+      if (currentPage && itemsPerPage) {
+        return {
+          data: response.data || [],
+          total: response.total || 0
+        }
+      }
+
       return response.data || []
-} catch (error) {
+    } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching farms:", error?.response?.data?.message)
       } else {

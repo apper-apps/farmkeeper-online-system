@@ -75,35 +75,54 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   )
 }
 const Farms = () => {
-  const [farms, setFarms] = useState([])
+const [farms, setFarms] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [showForm, setShowForm] = useState(false)
   const [editingFarm, setEditingFarm] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(6)
+  const [totalItems, setTotalItems] = useState(0)
   const [formData, setFormData] = useState({
     name: "",
     location: "",
     size: "",
     sizeUnit: "acres"
   })
-
-  useEffect(() => {
+useEffect(() => {
     loadFarms()
   }, [])
 
-  const loadFarms = async () => {
+  useEffect(() => {
+    loadFarms(currentPage)
+  }, [currentPage, itemsPerPage])
+
+  const loadFarms = async (page = 1) => {
     try {
       setLoading(true)
       setError("")
-      const data = await farmService.getAll()
-      setFarms(data)
+      const result = await farmService.getAll(page, itemsPerPage)
+      setFarms(result.data)
+      setTotalItems(result.total)
+      setCurrentPage(page)
     } catch (err) {
       setError("Failed to load farms. Please try again.")
       toast.error("Failed to load farms")
     } finally {
       setLoading(false)
     }
+  }
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= Math.ceil(totalItems / itemsPerPage)) {
+      setCurrentPage(page)
+    }
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1)
   }
 
   const handleSubmit = async (e) => {
@@ -180,22 +199,28 @@ const resetForm = () => {
     resetForm()
   }
 
-const filteredFarms = farms.filter(farm =>
-    farm.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farm.location.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+const filteredFarms = searchTerm 
+    ? farms.filter(farm =>
+        farm.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        farm.location.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : farms
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startItem = (currentPage - 1) * itemsPerPage + 1
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems)
 
   if (loading) return <Loading showCards={true} />
   if (error) return <Error message={error} onRetry={loadFarms} />
 
-  return (
+return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">My Farms</h1>
           <p className="text-gray-600 mt-1">
-            {farms.length} farm{farms.length !== 1 ? "s" : ""} • {farms.reduce((sum, farm) => sum + farm.size, 0)} total acres
+            {totalItems} farm{totalItems !== 1 ? "s" : ""} total
           </p>
         </div>
         <Button onClick={() => setShowForm(true)}>
@@ -205,7 +230,7 @@ const filteredFarms = farms.filter(farm =>
       </div>
 
       {/* Search */}
-      {farms.length > 0 && (
+      {totalItems > 0 && (
         <SearchBar
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -214,7 +239,7 @@ const filteredFarms = farms.filter(farm =>
         />
       )}
 
-{/* Add Farm Modal */}
+      {/* Add Farm Modal */}
       <Modal 
         isOpen={showForm} 
         onClose={closeModal}
@@ -275,7 +300,7 @@ const filteredFarms = farms.filter(farm =>
 
       {/* Farms Grid */}
       {filteredFarms.length === 0 ? (
-        farms.length === 0 ? (
+        totalItems === 0 ? (
           <Empty
             title="No farms yet"
             description="Add your first farm to start managing your agricultural operations."
@@ -291,15 +316,90 @@ const filteredFarms = farms.filter(farm =>
           </div>
         )
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredFarms.map((farm) => (
-            <FarmCard
-              key={farm.Id}
-              farm={farm}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredFarms.map((farm) => (
+              <FarmCard
+                key={farm.Id}
+                farm={farm}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {!searchTerm && totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-700">
+                  Showing {startItem}-{endItem} of {totalItems} farms
+                </span>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-700">Show:</label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                    className="border border-gray-300 rounded px-2 py-1 text-sm"
+                  >
+                    <option value={6}>6</option>
+                    <option value={12}>12</option>
+                    <option value={18}>18</option>
+                    <option value={24}>24</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ApperIcon name="ChevronLeft" size={16} />
+                  Previous
+                </Button>
+
+                <div className="flex gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        className="w-10 h-10 p-0"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ApperIcon name="ChevronRight" size={16} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
