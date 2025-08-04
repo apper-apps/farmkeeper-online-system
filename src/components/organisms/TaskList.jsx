@@ -19,8 +19,19 @@ const TaskList = ({ tasks, onComplete, onEdit, onDelete }) => {
     }
   }
 
-  const getStatusVariant = (status) => {
-    return "default"
+const getStatusVariant = (status) => {
+    switch (status) {
+      case "to do":
+        return "todo"
+      case "in progress":
+        return "in-progress"
+      case "completed":
+        return "completed"
+      case "overdue":
+        return "overdue"
+      default:
+        return "default"
+    }
   }
 
   const getTaskIcon = (type) => {
