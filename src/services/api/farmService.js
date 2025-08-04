@@ -22,9 +22,28 @@ const farmService = {
           { field: { Name: "sizeUnit" } },
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
-        ],
+],
         orderBy: [
           { fieldName: "CreatedOn", sorttype: "DESC" }
+        ],
+        aggregators: [
+          {
+            id: 'activeCropsCount',
+            fields: [
+              {
+                field: { Name: "farmId" },
+                Function: 'Count'
+              }
+            ],
+            where: [
+              {
+                FieldName: "status",
+                Operator: "ExactMatch",
+                Values: ["planted", "growing", "ready"]
+              }
+            ],
+            groupBy: ["farmId"]
+          }
         ]
       }
 
@@ -35,14 +54,19 @@ if (!response.success) {
         return []
       }
 
-      // Process aggregator results to add active crops count to each farm
+// Process aggregator results to add active crops count to each farm
       if (response.aggregators && response.aggregators.length > 0) {
         const activeCropsData = response.aggregators.find(agg => agg.id === 'activeCropsCount')
-        if (activeCropsData && response.data) {
+        if (activeCropsData && activeCropsData.data && response.data) {
           response.data.forEach(farm => {
             // Find the count for this specific farm
-            const farmCropCount = activeCropsData.data?.find(item => item.farmId === farm.Id)
+            const farmCropCount = activeCropsData.data.find(item => item.farmId === farm.Id)
             farm.activeCrops = farmCropCount ? farmCropCount.count : 0
+          })
+        } else if (response.data) {
+          // Ensure activeCrops is set to 0 if no aggregator data
+          response.data.forEach(farm => {
+            farm.activeCrops = 0
           })
         }
       }
