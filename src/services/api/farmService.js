@@ -19,10 +19,9 @@ const farmService = {
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
         ],
-        aggregators: [
+aggregators: [
           {
             id: 'activeCropsCount',
-            tableName: 'crop',
             fields: [
               { field: { Name: "Id" }, Function: 'Count' }
             ],
