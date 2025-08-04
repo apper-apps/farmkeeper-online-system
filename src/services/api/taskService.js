@@ -265,7 +265,8 @@ completed: taskData.completed,
           status: taskData.status,
           notes: taskData.notes || "",
           farmId: taskData.farmId ? parseInt(taskData.farmId) : null,
-          cropId: taskData.cropId ? parseInt(taskData.cropId) : null
+          cropId: taskData.cropId ? parseInt(taskData.cropId) : null,
+          kanbanOrder: taskData.kanbanOrder || 0
         }]
       }
       

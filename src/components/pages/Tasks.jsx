@@ -154,7 +154,6 @@ const handleEdit = (task) => {
       toast.error("Failed to delete task")
     }
   }
-
 const resetForm = () => {
     setFormData({
       farmId: "",
@@ -168,6 +167,73 @@ const resetForm = () => {
     })
     setEditingTask(null)
     setShowForm(false)
+  }
+
+  const handleDragEnd = async (result) => {
+    const { destination, source, draggableId } = result
+
+    // If dropped outside of any droppable
+    if (!destination) {
+      return
+    }
+
+    // If dropped in the same position
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return
+    }
+
+    const taskId = parseInt(draggableId)
+    const task = tasks.find(t => t.Id === taskId)
+    
+    if (!task) {
+      return
+    }
+
+    const newStatus = destination.droppableId
+    const oldStatus = source.droppableId
+
+    try {
+      // Calculate new kanban order
+      const tasksInDestination = tasks
+        .filter(t => t.status === newStatus && t.Id !== taskId)
+        .sort((a, b) => (a.kanbanOrder || 0) - (b.kanbanOrder || 0))
+
+      let newKanbanOrder = 0
+      if (destination.index === 0) {
+        // Moving to the top
+        newKanbanOrder = tasksInDestination.length > 0 ? (tasksInDestination[0].kanbanOrder || 0) - 1 : 0
+      } else if (destination.index >= tasksInDestination.length) {
+        // Moving to the bottom
+        newKanbanOrder = tasksInDestination.length > 0 ? (tasksInDestination[tasksInDestination.length - 1].kanbanOrder || 0) + 1 : 0
+      } else {
+        // Moving between items
+        const prevTask = tasksInDestination[destination.index - 1]
+        const nextTask = tasksInDestination[destination.index]
+        newKanbanOrder = ((prevTask?.kanbanOrder || 0) + (nextTask?.kanbanOrder || 0)) / 2
+      }
+
+      // Update task with new status and kanban order
+      const updatedTaskData = {
+        ...task,
+        status: newStatus,
+        kanbanOrder: newKanbanOrder
+      }
+
+      // Optimistically update UI
+      setTasks(tasks.map(t => t.Id === taskId ? updatedTaskData : t))
+
+      // Update in backend
+      await taskService.update(taskId, updatedTaskData)
+      
+      toast.success(`Task moved to ${newStatus}`)
+    } catch (error) {
+      // Revert on error
+      loadData()
+      toast.error("Failed to move task")
+    }
   }
 
 const filteredTasks = tasks.filter(task => {
@@ -500,6 +566,7 @@ const filteredTasks = tasks.filter(task => {
             onComplete={handleComplete}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onDragEnd={handleDragEnd}
           />
 
           {/* Pagination Controls - Bottom (only show if more than one page) */}
