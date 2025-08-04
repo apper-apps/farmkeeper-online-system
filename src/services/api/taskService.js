@@ -10,10 +10,10 @@ const taskService = {
     try {
       const params = {
         fields: [
-          { field: { Name: "Name" } },
+{ field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "Owner" } },
-{ field: { Name: "title" } },
+          { field: { Name: "title" } },
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
@@ -54,10 +54,10 @@ const taskService = {
     try {
       const params = {
         fields: [
-          { field: { Name: "Name" } },
+{ field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "Owner" } },
-{ field: { Name: "title" } },
+          { field: { Name: "title" } },
           { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
@@ -99,10 +99,10 @@ const taskService = {
       const params = {
         fields: [
           { field: { Name: "Name" } },
-          { field: { Name: "Tags" } },
+{ field: { Name: "Tags" } },
           { field: { Name: "Owner" } },
           { field: { Name: "title" } },
-{ field: { Name: "type" } },
+          { field: { Name: "type" } },
           { field: { Name: "dueDate" } },
           { field: { Name: "completed" } },
           { field: { Name: "priority" } },
@@ -199,16 +199,17 @@ const taskService = {
 async create(taskData) {
     try {
       // Only include Updateable fields
-      const params = {
+const params = {
         records: [{
-Name: taskData.Name || taskData.title,
+          Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
           Owner: taskData.Owner?.Id || parseInt(taskData.Owner) || null,
           title: taskData.title,
           type: taskData.type || "other",
           dueDate: taskData.dueDate,
-          completed: false,
+completed: false,
           priority: taskData.priority || "medium",
+          status: taskData.status || "to do",
           notes: taskData.notes || "",
           farmId: parseInt(taskData.farmId),
           cropId: taskData.cropId ? parseInt(taskData.cropId) : null
@@ -249,16 +250,17 @@ async update(id, taskData) {
     try {
       // Only include Updateable fields
       const params = {
-        records: [{
+records: [{
           Id: parseInt(id),
-Name: taskData.Name || taskData.title,
+          Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
           Owner: taskData.Owner?.Id || parseInt(taskData.Owner) || null,
           title: taskData.title,
           type: taskData.type,
-          dueDate: taskData.dueDate,
+dueDate: taskData.dueDate,
           completed: taskData.completed,
           priority: taskData.priority,
+          status: taskData.status,
           notes: taskData.notes || "",
           farmId: parseInt(taskData.farmId),
           cropId: taskData.cropId ? parseInt(taskData.cropId) : null
