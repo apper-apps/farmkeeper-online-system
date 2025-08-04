@@ -23,9 +23,9 @@ const Tasks = () => {
   const [error, setError] = useState("")
   const [showForm, setShowForm] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("")
+const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  
+  const [viewMode, setViewMode] = useState("list") // "list" or "kanban"
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(20)
@@ -286,8 +286,34 @@ const filteredTasks = tasks.filter(task => {
           placeholder="Search tasks by title, farm, or crop..."
           className="max-w-md"
         />
-      )}
+)}
 
+      {/* View Toggle */}
+      {tasks.length > 0 && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">View:</span>
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <Button
+              variant={viewMode === "list" ? "primary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="px-3 py-1 text-xs rounded-md"
+            >
+              <ApperIcon name="List" size={14} />
+              List
+            </Button>
+            <Button
+              variant={viewMode === "kanban" ? "primary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("kanban")}
+              className="px-3 py-1 text-xs rounded-md"
+            >
+              <ApperIcon name="Columns" size={14} />
+              Kanban
+            </Button>
+          </div>
+        </div>
+      )}
       {/* Add/Edit Form */}
 <AnimatePresence>
         {showForm && (
@@ -468,8 +494,9 @@ const filteredTasks = tasks.filter(task => {
           />
 
           {/* Task List */}
-          <TaskList
+<TaskList
             tasks={paginatedTasks}
+            viewMode={viewMode}
             onComplete={handleComplete}
             onEdit={handleEdit}
             onDelete={handleDelete}
