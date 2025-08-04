@@ -133,21 +133,27 @@ useEffect(() => {
       return
     }
 
-    try {
+try {
       const farmData = {
-        ...formData,
+        name: formData.name,
+        location: formData.location,
         size: parseFloat(formData.size),
+        sizeUnit: formData.sizeUnit,
         createdAt: editingFarm?.createdAt || new Date().toISOString()
       }
 
       if (editingFarm) {
         const updatedFarm = await farmService.update(editingFarm.Id, farmData)
-        setFarms(farms.map(farm => farm.Id === editingFarm.Id ? updatedFarm : farm))
-        toast.success("Farm updated successfully!")
+        if (updatedFarm) {
+          setFarms(farms.map(farm => farm.Id === editingFarm.Id ? updatedFarm : farm))
+          toast.success("Farm updated successfully!")
+        }
       } else {
         const newFarm = await farmService.create(farmData)
-        setFarms([...farms, newFarm])
-        toast.success("Farm added successfully!")
+        if (newFarm) {
+          setFarms([...farms, newFarm])
+          toast.success("Farm created successfully!")
+        }
       }
 
       resetForm()
@@ -156,10 +162,10 @@ useEffect(() => {
     }
   }
 
-  const handleEdit = (farm) => {
+const handleEdit = (farm) => {
     setEditingFarm(farm)
     setFormData({
-name: farm.Name,
+      name: farm.Name,
       location: farm.location,
       size: farm.size.toString(),
       sizeUnit: farm.sizeUnit

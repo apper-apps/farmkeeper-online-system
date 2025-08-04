@@ -93,12 +93,12 @@ async getAll(currentPage = null, itemsPerPage = null) {
     }
   },
 
-  async create(farmData) {
+async create(farmData) {
     try {
       const params = {
         records: [
           {
-            Name: farmData.Name,
+            Name: farmData.name || farmData.Name,
             Tags: farmData.Tags,
             Owner: farmData.Owner,
             location: farmData.location,
@@ -118,7 +118,7 @@ async getAll(currentPage = null, itemsPerPage = null) {
       }
 
       return response.results?.[0]?.data
-} catch (error) {
+    } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error creating farm:", error?.response?.data?.message)
       } else {
@@ -128,13 +128,13 @@ async getAll(currentPage = null, itemsPerPage = null) {
     }
   },
 
-  async update(id, farmData) {
+async update(id, farmData) {
     try {
       const params = {
         records: [
           {
             Id: parseInt(id),
-            Name: farmData.Name,
+            Name: farmData.name || farmData.Name,
             Tags: farmData.Tags,
             Owner: farmData.Owner,
             location: farmData.location,
@@ -153,7 +153,7 @@ async getAll(currentPage = null, itemsPerPage = null) {
       }
 
       return response.results?.[0]?.data
-} catch (error) {
+    } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error updating farm:", error?.response?.data?.message)
       } else {
