@@ -67,7 +67,7 @@ const [transactions, setTransactions] = useState([])
       // Enrich transactions with farm names
 const enrichedTransactions = transactionsData.map(transaction => ({
         ...transaction,
-        farmName: farmsData.find(farm => farm.Id === transaction.farmId)?.Name || "Unknown Farm"
+        farmName: transaction.farmId?.Name || farmsData.find(farm => farm.Id === (transaction.farmId?.Id || transaction.farmId))?.Name || "Unknown Farm"
       }))
       
       setTransactions(enrichedTransactions)
@@ -99,14 +99,14 @@ const enrichedTransactions = transactionsData.map(transaction => ({
         result = await transactionService.update(editingTransaction.Id, transactionData)
 setTransactions(transactions.map(transaction => transaction.Id === editingTransaction.Id ? {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
+          farmName: result.farmId?.Name || farms.find(farm => farm.Id === (result.farmId?.Id || result.farmId))?.Name || "Unknown Farm"
         } : transaction))
         toast.success("Transaction updated successfully!")
       } else {
         result = await transactionService.create(transactionData)
 setTransactions([...transactions, {
           ...result,
-          farmName: farms.find(farm => farm.Id === result.farmId)?.Name || "Unknown Farm"
+          farmName: result.farmId?.Name || farms.find(farm => farm.Id === (result.farmId?.Id || result.farmId))?.Name || "Unknown Farm"
         }])
         toast.success("Transaction added successfully!")
       }
@@ -346,10 +346,10 @@ const typeCounts = {
       csvData.push(['Date', 'Farm', 'Type', 'Category', 'Amount', 'Description'])
       
 reportTransactions.forEach(transaction => {
-        const farm = farms.find(f => f.Id === transaction.farmId)
+        const farmName = transaction.farmId?.Name || farms.find(f => f.Id === (transaction.farmId?.Id || transaction.farmId))?.Name || 'Unknown Farm'
         csvData.push([
           format(new Date(transaction.date), "yyyy-MM-dd"),
-          farm ? farm.Name : 'Unknown Farm',
+          farmName,
           transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
           transaction.category,
           `$${parseFloat(transaction.amount).toFixed(2)}`,
@@ -489,10 +489,10 @@ reportTransactions.forEach(transaction => {
         yPosition += 10
         
 const transactionTableData = reportTransactions.map(transaction => {
-          const farm = farms.find(f => f.Id === transaction.farmId)
+          const farmName = transaction.farmId?.Name || farms.find(f => f.Id === (transaction.farmId?.Id || transaction.farmId))?.Name || 'Unknown'
           return [
             format(new Date(transaction.date), "yyyy-MM-dd"),
-            farm ? farm.Name : 'Unknown',
+            farmName,
             transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
             transaction.category,
             `$${parseFloat(transaction.amount).toFixed(2)}`,
