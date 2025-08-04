@@ -285,15 +285,22 @@ setTasks([...tasks, {
                       ))}
                     </FormField>
 
-                    <FormField
+<FormField
                       label="Crop (Optional)"
                       type="select"
                       value={formData.cropId}
                       onChange={(e) => setFormData({...formData, cropId: e.target.value})}
                       disabled={!formData.farmId}
                     >
-                      <option value="">Select a crop</option>
-{availableCrops.map(crop => (
+                      <option value="">
+                        {!formData.farmId 
+                          ? "Select a farm first" 
+                          : availableCrops.length === 0 
+                            ? "No crops available for this farm" 
+                            : "Select a crop"
+                        }
+                      </option>
+                      {availableCrops.map(crop => (
                         <option key={crop.Id} value={crop.Id}>{crop.Name}</option>
                       ))}
                     </FormField>
