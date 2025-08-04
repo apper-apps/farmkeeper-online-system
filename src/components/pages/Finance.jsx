@@ -10,6 +10,7 @@ import StatCard from "@/components/molecules/StatCard"
 import Button from "@/components/atoms/Button"
 import FormField from "@/components/molecules/FormField"
 import SearchBar from "@/components/molecules/SearchBar"
+import PaginationControls from "@/components/molecules/PaginationControls"
 import ApperIcon from "@/components/ApperIcon"
 import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
@@ -32,8 +33,11 @@ const [transactions, setTransactions] = useState([])
   const [reportDateRange, setReportDateRange] = useState({
     startDate: format(startOfMonth(new Date()), "yyyy-MM-dd"),
     endDate: format(endOfMonth(new Date()), "yyyy-MM-dd")
-  })
+})
   const [generatingReport, setGeneratingReport] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
 const [formData, setFormData] = useState({
     farmId: "",
     Name: "",
@@ -55,6 +59,11 @@ const [formData, setFormData] = useState({
   useEffect(() => {
     loadData()
   }, [])
+
+  // Reset pagination when search or filter criteria change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, typeFilter, dateRange])
 
   const loadData = async () => {
     try {
@@ -198,7 +207,16 @@ setFormData({
     return filtered
   }
 
-  const filteredTransactions = getFilteredTransactions()
+const filteredTransactions = getFilteredTransactions()
+
+  const getPaginatedTransactions = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return filteredTransactions.slice(startIndex, endIndex)
+  }
+
+  const paginatedTransactions = getPaginatedTransactions()
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
 
   const calculateStats = () => {
     const income = filteredTransactions
@@ -944,7 +962,7 @@ const transactionTableData = reportTransactions.map(transaction => {
         )}
       </AnimatePresence>
 
-      {/* Transactions Table */}
+{/* Transactions Table */}
       {filteredTransactions.length === 0 ? (
         transactions.length === 0 ? (
           <Empty
@@ -962,11 +980,30 @@ const transactionTableData = reportTransactions.map(transaction => {
           </div>
         )
       ) : (
-        <TransactionTable
-          transactions={filteredTransactions}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <>
+          <TransactionTable
+            transactions={paginatedTransactions}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-6">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredTransactions.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newItemsPerPage) => {
+                  setItemsPerPage(newItemsPerPage)
+                  setCurrentPage(1) // Reset to first page when changing items per page
+                }}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )
