@@ -30,9 +30,21 @@ const farmService = {
 
       const response = await apperClient.fetchRecords("farm", params)
       
-      if (!response.success) {
+if (!response.success) {
         console.error(response.message)
         return []
+      }
+
+      // Process aggregator results to add active crops count to each farm
+      if (response.aggregators && response.aggregators.length > 0) {
+        const activeCropsData = response.aggregators.find(agg => agg.id === 'activeCropsCount')
+        if (activeCropsData && response.data) {
+          response.data.forEach(farm => {
+            // Find the count for this specific farm
+            const farmCropCount = activeCropsData.data?.find(item => item.farmId === farm.Id)
+            farm.activeCrops = farmCropCount ? farmCropCount.count : 0
+          })
+        }
       }
 
       return response.data || []
@@ -58,10 +70,42 @@ const farmService = {
           { field: { Name: "sizeUnit" } },
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
+],
+        aggregators: [
+          {
+            id: 'activeCropsCount',
+            fields: [
+              {
+                field: { Name: "Id" },
+                Function: 'Count'
+              }
+            ],
+            where: [
+              {
+                FieldName: "status",
+                Operator: "ExactMatch",
+                Values: ["planted", "growing", "ready"]
+              },
+              {
+                FieldName: "farmId",
+                Operator: "EqualTo",
+                Values: [parseInt(id)]
+              }
+            ]
+          }
         ]
       }
 
       const response = await apperClient.getRecordById("farm", id, params)
+      
+      // Process aggregator results for single farm
+      if (response.success && response.aggregators && response.aggregators.length > 0) {
+        const activeCropsData = response.aggregators.find(agg => agg.id === 'activeCropsCount')
+        if (activeCropsData && response.data) {
+          response.data.activeCrops = activeCropsData.value || 0
+        }
+      }
+      
       return response.data
     } catch (error) {
       if (error?.response?.data?.message) {
