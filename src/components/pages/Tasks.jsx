@@ -32,7 +32,7 @@ const [formData, setFormData] = useState({
     type: "watering",
     dueDate: "",
     priority: "medium",
-    status: "TBD",
+    status: "to do",
     notes: ""
   })
 
@@ -123,16 +123,16 @@ setTasks([...tasks, {
     }
   }
 
-  const handleEdit = (task) => {
+const handleEdit = (task) => {
     setEditingTask(task)
-setFormData({
+    setFormData({
       farmId: task.farmId,
       cropId: task.cropId || "",
       title: task.title,
       type: task.type,
       dueDate: task.dueDate.split('T')[0],
       priority: task.priority,
-      status: task.status || "TBD",
+      status: task.status || "to do",
       notes: task.notes || ""
     })
     setShowForm(true)
@@ -160,7 +160,7 @@ setFormData({
       type: "watering",
       dueDate: "",
       priority: "medium",
-      status: "TBD",
+      status: "to do",
       notes: ""
     })
     setEditingTask(null)
@@ -369,13 +369,16 @@ setFormData({
                       <option value="high">High</option>
                     </FormField>
 
-                    <FormField
+<FormField
                       label="Status"
                       type="select"
                       value={formData.status}
                       onChange={(e) => setFormData({...formData, status: e.target.value})}
                     >
-                      <option value="TBD">TBD</option>
+                      <option value="to do">To Do</option>
+                      <option value="in progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="overdue">Overdue</option>
                     </FormField>
 
                     <div className="md:col-span-2 lg:col-span-3">
