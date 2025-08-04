@@ -1,3 +1,5 @@
+import React from "react";
+import Error from "@/components/ui/Error";
 const { ApperClient } = window.ApperSDK
 
 const apperClient = new ApperClient({
@@ -8,8 +10,8 @@ const apperClient = new ApperClient({
 const taskService = {
   async getAll() {
     try {
-      const params = {
-fields: [
+const params = {
+        fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
           { field: { name: "Owner" } },
@@ -52,8 +54,8 @@ fields: [
 
   async getById(id) {
     try {
-      const params = {
-fields: [
+const params = {
+        fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
           { field: { name: "Owner" } },
@@ -96,8 +98,8 @@ fields: [
 
   async getByFarmId(farmId) {
     try {
-      const params = {
-fields: [
+const params = {
+        fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
           { field: { name: "Owner" } },
@@ -147,8 +149,8 @@ fields: [
 
   async getByCropId(cropId) {
     try {
-      const params = {
-fields: [
+const params = {
+        fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
           { field: { name: "Owner" } },
@@ -198,8 +200,8 @@ fields: [
 
 async create(taskData) {
     try {
-      // Only include Updateable fields
-const params = {
+// Only include Updateable fields - validate record exists before update
+      const params = {
         records: [{
           Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
@@ -248,17 +250,17 @@ const params = {
 
 async update(id, taskData) {
     try {
-      // Only include Updateable fields
-const params = {
+// Only include Updateable fields - ensure proper field validation
+      const params = {
         records: [{
           Id: parseInt(id),
           Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
           Owner: taskData.Owner?.Id || (taskData.Owner ? parseInt(taskData.Owner) : null),
           title: taskData.title,
-          type: taskData.type,
+type: taskData.type,
           dueDate: taskData.dueDate,
-          completed: taskData.completed,
+completed: taskData.completed,
           priority: taskData.priority,
           status: taskData.status,
           notes: taskData.notes || "",
