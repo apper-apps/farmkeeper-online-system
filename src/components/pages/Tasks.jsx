@@ -25,13 +25,14 @@ const [farms, setFarms] = useState([])
   const [editingTask, setEditingTask] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     farmId: "",
     cropId: "",
     title: "",
     type: "watering",
     dueDate: "",
     priority: "medium",
+    status: "TBD",
     notes: ""
   })
 
@@ -77,7 +78,7 @@ setFarms(farmsData)
     }
 
     try {
-      const taskData = {
+const taskData = {
         ...formData,
         completed: false
       }
@@ -124,13 +125,14 @@ setTasks([...tasks, {
 
   const handleEdit = (task) => {
     setEditingTask(task)
-    setFormData({
+setFormData({
       farmId: task.farmId,
       cropId: task.cropId || "",
       title: task.title,
       type: task.type,
       dueDate: task.dueDate.split('T')[0],
       priority: task.priority,
+      status: task.status || "TBD",
       notes: task.notes || ""
     })
     setShowForm(true)
@@ -151,13 +153,14 @@ setTasks([...tasks, {
   }
 
   const resetForm = () => {
-    setFormData({
+setFormData({
       farmId: "",
       cropId: "",
       title: "",
       type: "watering",
       dueDate: "",
       priority: "medium",
+      status: "TBD",
       notes: ""
     })
     setEditingTask(null)
@@ -355,7 +358,7 @@ setTasks([...tasks, {
                       onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
                     />
 
-                    <FormField
+<FormField
                       label="Priority"
                       type="select"
                       value={formData.priority}
@@ -364,6 +367,15 @@ setTasks([...tasks, {
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
                       <option value="high">High</option>
+                    </FormField>
+
+                    <FormField
+                      label="Status"
+                      type="select"
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                    >
+                      <option value="TBD">TBD</option>
                     </FormField>
 
                     <div className="md:col-span-2 lg:col-span-3">

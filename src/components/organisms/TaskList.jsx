@@ -19,6 +19,10 @@ const TaskList = ({ tasks, onComplete, onEdit, onDelete }) => {
     }
   }
 
+  const getStatusVariant = (status) => {
+    return "default"
+  }
+
   const getTaskIcon = (type) => {
     switch (type) {
       case "watering":
@@ -116,7 +120,7 @@ const TaskList = ({ tasks, onComplete, onEdit, onDelete }) => {
                         {task.priority}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+<div className="flex items-center gap-4 text-sm text-gray-600">
                       <span className="flex items-center gap-1">
                         <ApperIcon name="MapPin" size={14} />
                         {task.farmName}
@@ -131,6 +135,11 @@ const TaskList = ({ tasks, onComplete, onEdit, onDelete }) => {
                         <ApperIcon name="Clock" size={14} />
                         {getDueDateDisplay(task.dueDate)}
                       </span>
+                      {task.status && (
+                        <Badge variant={getStatusVariant(task.status)}>
+                          {task.status}
+                        </Badge>
+                      )}
                     </div>
                     {task.notes && (
                       <p className="text-sm text-gray-600 mt-2">{task.notes}</p>
