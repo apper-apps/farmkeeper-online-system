@@ -147,13 +147,13 @@ name: farm.Name,
     })
     setShowForm(true)
   }
-
-  const handleDelete = async (farm) => {
-    if (!window.confirm(`Are you sure you want to delete "${farm.name}"? This action cannot be undone.`)) {
+const handleDelete = async (farm) => {
+    if (!window.confirm(`Are you sure you want to delete "${farm.Name}"? This action cannot be undone.`)) {
       return
     }
 
     try {
+      await farmService.delete(farm.Id)
       await farmService.delete(farm.Id)
       setFarms(farms.filter(f => f.Id !== farm.Id))
       toast.success("Farm deleted successfully!")

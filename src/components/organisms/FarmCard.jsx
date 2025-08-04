@@ -17,8 +17,8 @@ const FarmCard = ({ farm, onView, onEdit, onDelete }) => {
           <div className="p-3 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg">
             <ApperIcon name="MapPin" size={20} className="text-white" />
           </div>
-          <div>
-<h3 className="text-lg font-semibold text-gray-900">{farm.Name}</h3>
+<div>
+            <h3 className="text-lg font-semibold text-gray-900">{farm.Name}</h3>
             <p className="text-gray-600 flex items-center gap-1">
               <ApperIcon name="Navigation" size={14} />
               {farm.location}

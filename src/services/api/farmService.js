@@ -18,6 +18,23 @@ const farmService = {
           { field: { Name: "sizeUnit" } },
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
+        ],
+        aggregators: [
+          {
+            id: 'activeCropsCount',
+            tableName: 'crop',
+            fields: [
+              { field: { Name: "Id" }, Function: 'Count' }
+            ],
+            where: [
+              {
+                FieldName: "status",
+                Operator: "NotEqualTo", 
+                Values: ["harvested"]
+              }
+            ],
+            groupBy: ["farmId"]
+          }
         ]
       }
       
@@ -28,7 +45,29 @@ const farmService = {
         throw new Error(response.message)
       }
       
-      return response.data || []
+      // Process the response to include active crops count
+      let farms = response.data || []
+      
+      // If we have aggregator results, merge them with farm data
+      if (response.aggregators && response.aggregators.activeCropsCount) {
+        const activeCropsCounts = response.aggregators.activeCropsCount
+        
+        farms = farms.map(farm => {
+          const cropsCount = activeCropsCounts.find(count => count.farmId === farm.Id)
+          return {
+            ...farm,
+            activeCrops: cropsCount ? cropsCount.count : 0
+          }
+        })
+      } else {
+        // Fallback: set activeCrops to the existing value or 0
+        farms = farms.map(farm => ({
+          ...farm,
+          activeCrops: farm.activeCrops || 0
+        }))
+      }
+      
+      return farms
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching farms:", error?.response?.data?.message)
@@ -85,8 +124,7 @@ const farmService = {
           location: farmData.location,
           size: parseFloat(farmData.size),
           sizeUnit: farmData.sizeUnit || "acres",
-          createdAt: new Date().toISOString(),
-          activeCrops: 0
+          createdAt: new Date().toISOString()
         }]
       }
       
@@ -105,10 +143,12 @@ const farmService = {
           throw new Error(failedRecords[0].message || "Failed to create farm")
         }
         
-        return response.results[0].data
+        const newFarm = response.results[0].data
+        // Set activeCrops to 0 for new farms
+        return { ...newFarm, activeCrops: 0 }
       }
       
-      return response.data
+      return { ...response.data, activeCrops: 0 }
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error creating farm:", error?.response?.data?.message)
@@ -131,8 +171,7 @@ const farmService = {
           Owner: farmData.Owner,
           location: farmData.location,
           size: parseFloat(farmData.size),
-          sizeUnit: farmData.sizeUnit || "acres",
-          activeCrops: farmData.activeCrops || 0
+          sizeUnit: farmData.sizeUnit || "acres"
         }]
       }
       
