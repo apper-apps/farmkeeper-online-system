@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Inventory from "@/components/pages/Inventory";
-import App from "@/index.css";
+import "@/index.css";
 import Layout from "@/components/organisms/Layout";
 import Finance from "@/components/pages/Finance";
 import Login from "@/components/pages/Login";
