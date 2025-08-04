@@ -66,38 +66,70 @@ const getStatusVariant = (status) => {
     if (isTomorrow(date)) return "text-primary-600"
     return "text-gray-600"
   }
-
-  const groupedTasks = tasks.reduce((groups, task) => {
-    const date = format(new Date(task.dueDate), "yyyy-MM-dd")
-    if (!groups[date]) {
-      groups[date] = []
+const groupedTasks = tasks.reduce((groups, task) => {
+    const status = task.status || "to do"
+    if (!groups[status]) {
+      groups[status] = []
     }
-    groups[date].push(task)
+    groups[status].push(task)
     return groups
   }, {})
 
-  return (
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "to do":
+        return "CheckSquare"
+      case "in progress":
+        return "Clock"
+      case "completed":
+        return "CheckCircle"
+      case "overdue":
+        return "AlertTriangle"
+      default:
+        return "CheckSquare"
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "to do":
+        return "To Do"
+      case "in progress":
+        return "In Progress"
+      case "completed":
+        return "Completed"
+      case "overdue":
+        return "Overdue"
+      default:
+        return "To Do"
+    }
+  }
+
+  // Sort status groups in logical order
+  const statusOrder = ["to do", "in progress", "completed", "overdue"]
+
+return (
     <div className="space-y-6">
-      {Object.entries(groupedTasks)
-        .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
-        .map(([date, dateTasks]) => (
-          <div key={date} className="card p-6">
+      {statusOrder
+        .filter(status => groupedTasks[status] && groupedTasks[status].length > 0)
+        .map(status => (
+          <div key={status} className="card p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <ApperIcon name="Calendar" size={20} className="text-primary-600" />
-              {getDueDateDisplay(date)}
-              <span className="text-sm font-normal text-gray-600">
-                ({dateTasks.length} task{dateTasks.length !== 1 ? "s" : ""})
+              <ApperIcon name={getStatusIcon(status)} size={20} className="text-primary-600" />
+              {getStatusLabel(status)}
+              <span className={`status-badge status-${status.replace(' ', '-')}`}>
+                {groupedTasks[status].length} task{groupedTasks[status].length !== 1 ? "s" : ""}
               </span>
             </h3>
-            
-            <div className="space-y-3">
-              {dateTasks.map((task, index) => (
+<div className="space-y-3">
+              {groupedTasks[status].map((task, index) => (
                 <motion.div
                   key={task.Id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className={`flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200 ${
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                >
                     task.completed 
                       ? "bg-green-50 border-green-200" 
                       : "bg-white border-gray-200 hover:border-primary-300 hover:shadow-md"
