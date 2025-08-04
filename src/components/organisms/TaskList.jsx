@@ -128,7 +128,7 @@ return (
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`relative border rounded-xl transition-all duration-200 ${
+                  className={`group relative border rounded-xl transition-all duration-200 ${
                     task.completed 
                       ? "bg-green-50/50 border-green-200 shadow-sm" 
                       : "bg-white border-gray-200 hover:border-primary-300 hover:shadow-lg"
