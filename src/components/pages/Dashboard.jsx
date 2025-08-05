@@ -68,9 +68,8 @@ const Dashboard = () => {
 
   if (loading) return <Loading showCards={true} />
   if (error) return <Error message={error} onRetry={loadDashboardData} />
-
-  const activeCrops = crops.filter(crop => crop.status !== "harvested")
-  const pendingTasks = tasks.filter(task => !task.completed)
+const activeCrops = (crops || []).filter(crop => crop.status !== "harvested")
+  const pendingTasks = (tasks || []).filter(task => !task.completed)
   const completedTasks = tasks.filter(task => task.completed)
   const thisMonthTransactions = transactions.filter(t => {
     const transactionDate = new Date(t.date)
