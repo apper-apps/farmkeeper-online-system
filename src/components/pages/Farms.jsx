@@ -248,10 +248,10 @@ return (
       </div>
 
       {/* Search */}
-      {totalItems > 0 && (
+{totalItems > 0 && (
         <SearchBar
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(value) => setSearchTerm(value)}
           placeholder="Search farms by name or location..."
           className="max-w-md"
         />
