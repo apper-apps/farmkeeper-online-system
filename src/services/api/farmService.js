@@ -95,6 +95,9 @@ async getAll(currentPage = null, itemsPerPage = null) {
 
 async create(farmData) {
     try {
+      // Calculate active crops count (new farms start with 0 active crops)
+      let activeCropsCount = 0;
+
       const params = {
         records: [
           {
@@ -105,7 +108,7 @@ async create(farmData) {
             size: parseFloat(farmData.size),
             sizeUnit: farmData.sizeUnit,
             createdAt: farmData.createdAt,
-            activeCrops: parseInt(farmData.activeCrops) || 0
+            activeCrops: activeCropsCount
           }
         ]
       }
@@ -130,6 +133,38 @@ async create(farmData) {
 
 async update(id, farmData) {
     try {
+      // Calculate active crops count by querying crop records
+      let activeCropsCount = 0;
+      
+      try {
+        const cropParams = {
+          fields: [
+            { field: { Name: "status" } },
+            { field: { Name: "farmId" } }
+          ],
+          where: [
+            {
+              FieldName: "farmId",
+              Operator: "EqualTo", 
+              Values: [parseInt(id)]
+            }
+          ]
+        };
+        
+        const cropResponse = await apperClient.fetchRecords('crop', cropParams);
+        
+        if (cropResponse.success && cropResponse.data) {
+          // Count crops with active statuses (exclude harvested)
+          activeCropsCount = cropResponse.data.filter(crop => 
+            crop.status && ['planted', 'growing', 'ready'].includes(crop.status.toLowerCase())
+          ).length;
+        }
+      } catch (cropError) {
+        console.error("Error calculating active crops count:", cropError.message);
+        // Continue with update even if crop count fails, use 0 as fallback
+        activeCropsCount = 0;
+      }
+
       const params = {
         records: [
           {
@@ -140,7 +175,7 @@ async update(id, farmData) {
             location: farmData.location,
             size: parseFloat(farmData.size),
             sizeUnit: farmData.sizeUnit,
-            activeCrops: parseInt(farmData.activeCrops) || 0
+            activeCrops: activeCropsCount
           }
         ]
       }
