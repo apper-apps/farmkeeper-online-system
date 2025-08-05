@@ -73,7 +73,7 @@ const loadData = async () => {
     }
   }
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
     
     if (!formData.farmId || !formData.name || !formData.plantingDate || !formData.expectedHarvestDate || !formData.area) {
@@ -89,8 +89,9 @@ const loadData = async () => {
 
       let result
       if (editingCrop) {
+        const previousStatus = editingCrop.status
         result = await cropService.update(editingCrop.Id, cropData)
-setCrops(crops.map(crop => crop.Id === editingCrop.Id ? {
+        setCrops(crops.map(crop => crop.Id === editingCrop.Id ? {
           ...result,
           farmName: farms.find(farm => {
             const resultFarmId = typeof result.farmId === 'object' ? result.farmId?.Id : result.farmId
@@ -98,9 +99,17 @@ setCrops(crops.map(crop => crop.Id === editingCrop.Id ? {
           })?.Name || "Unknown Farm"
         } : crop))
         toast.success("Crop updated successfully!")
+        
+        // If status changed to 'ready', navigate to ready-to-harvest page
+        if (previousStatus !== 'ready' && cropData.status === 'ready') {
+          toast.success("Crop is now ready to harvest! Redirecting to Ready to Harvest page...")
+          setTimeout(() => {
+            window.location.href = '/ready-to-harvest'
+          }, 2000)
+        }
       } else {
         result = await cropService.create(cropData)
-setCrops([...crops, {
+        setCrops([...crops, {
           ...result,
           farmName: farms.find(farm => {
             const resultFarmId = typeof result.farmId === 'object' ? result.farmId?.Id : result.farmId
@@ -108,6 +117,14 @@ setCrops([...crops, {
           })?.Name || "Unknown Farm"
         }])
         toast.success("Crop added successfully!")
+        
+        // If new crop is created with 'ready' status, navigate to ready-to-harvest page
+        if (cropData.status === 'ready') {
+          toast.success("Crop is ready to harvest! Redirecting to Ready to Harvest page...")
+          setTimeout(() => {
+            window.location.href = '/ready-to-harvest'
+          }, 2000)
+        }
       }
 
       resetForm()

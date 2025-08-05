@@ -14,6 +14,7 @@ const menuItems = [
     { path: '/', label: 'Dashboard', icon: 'BarChart3' },
     { path: '/farms', label: 'Farms', icon: 'MapPin' },
     { path: '/crops', label: 'Crops', icon: 'Sprout' },
+    { path: '/ready-to-harvest', label: 'Ready to Harvest', icon: 'Harvest' },
     { path: '/tasks', label: 'Tasks', icon: 'CheckSquare' },
     { path: '/finance', label: 'Finance', icon: 'DollarSign' },
     { path: '/weather', label: 'Weather', icon: 'Sun' },

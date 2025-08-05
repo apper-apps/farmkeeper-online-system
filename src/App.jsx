@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Inventory from "@/components/pages/Inventory";
+import ReadyToHarvest from "@/components/pages/ReadyToHarvest";
 import "@/index.css";
 import Layout from "@/components/organisms/Layout";
 import Finance from "@/components/pages/Finance";
@@ -135,6 +136,7 @@ function AppContent() {
           <Route index element={<Dashboard />} />
           <Route path="farms" element={<Farms />} />
           <Route path="crops" element={<Crops />} />
+          <Route path="ready-to-harvest" element={<ReadyToHarvest />} />
           <Route path="tasks" element={<Tasks />} />
           <Route path="finance" element={<Finance />} />
           <Route path="weather" element={<Weather />} />

@@ -257,6 +257,56 @@ const cropService = {
         throw error
       }
     }
+},
+
+  async getReadyToHarvest(page = 1, limit = 20) {
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "variety" } },
+          { field: { Name: "plantingDate" } },
+          { field: { Name: "expectedHarvestDate" } },
+          { field: { Name: "status" } },
+          { field: { Name: "area" } },
+          { field: { Name: "notes" } },
+          { field: { Name: "farmId" } }
+        ],
+        where: [
+          {
+            FieldName: "status",
+            Operator: "EqualTo",
+            Values: ["ready"]
+          }
+        ],
+        pagingInfo: {
+          limit: limit,
+          offset: (page - 1) * limit
+        }
+      }
+      
+      const response = await apperClient.fetchRecords('crop', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+      
+      return {
+        data: response.data || [],
+        total: response.total || 0
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching ready to harvest crops:", error?.response?.data?.message)
+        throw new Error(error.response.data.message)
+      } else {
+        console.error("Error fetching ready to harvest crops:", error.message)
+        throw error
+      }
+    }
   }
 }
 
