@@ -41,16 +41,19 @@ const [currentPage, setCurrentPage] = useState(1)
     loadData()
   }, [])
 
-  const loadData = async () => {
+const loadData = async () => {
     try {
       setLoading(true)
       setError("")
-      const [cropsData, farmsData] = await Promise.all([
-        cropService.getAll(),
+      const [cropsResponse, farmsData] = await Promise.all([
+        cropService.getAll(1, 20),
         farmService.getAll()
       ])
       
-// Enrich crops with farm names
+      // Extract data from paginated response
+      const cropsData = cropsResponse.data || []
+      
+      // Enrich crops with farm names
       const enrichedCrops = cropsData.map(crop => ({
         ...crop,
         farmName: farmsData.find(farm => {
