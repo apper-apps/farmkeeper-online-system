@@ -75,10 +75,11 @@ const ReadyToHarvest = () => {
     }
   };
 
-  const filteredCrops = crops.filter(crop => {
-    const matchesSearch = crop.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         crop.variety?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         crop.farmName?.toLowerCase().includes(searchTerm.toLowerCase());
+const filteredCrops = crops.filter(crop => {
+    const searchTermLower = (searchTerm ?? '').toString().toLowerCase();
+    const matchesSearch = crop.Name?.toLowerCase().includes(searchTermLower) ||
+                         crop.variety?.toLowerCase().includes(searchTermLower) ||
+                         crop.farmName?.toLowerCase().includes(searchTermLower);
     return matchesSearch;
   });
 
