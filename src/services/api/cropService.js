@@ -6,7 +6,7 @@ const apperClient = new ApperClient({
 })
 
 const cropService = {
-  async getAll() {
+  async getAll(page = 1, limit = 20) {
     try {
       const params = {
         fields: [
@@ -17,10 +17,14 @@ const cropService = {
           { field: { Name: "plantingDate" } },
           { field: { Name: "expectedHarvestDate" } },
           { field: { Name: "status" } },
-{ field: { Name: "area" } },
+          { field: { Name: "area" } },
           { field: { Name: "notes" } },
           { field: { Name: "farmId" } }
-        ]
+        ],
+        pagingInfo: {
+          limit: limit,
+          offset: (page - 1) * limit
+        }
       }
       
       const response = await apperClient.fetchRecords('crop', params)
@@ -30,7 +34,10 @@ const cropService = {
         throw new Error(response.message)
       }
       
-      return response.data || []
+      return {
+        data: response.data || [],
+        total: response.total || 0
+      }
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching crops:", error?.response?.data?.message)

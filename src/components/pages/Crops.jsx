@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react"
-import { toast } from "react-toastify"
-import { motion, AnimatePresence } from "framer-motion"
-import CropTable from "@/components/organisms/CropTable"
-import Button from "@/components/atoms/Button"
-import FormField from "@/components/molecules/FormField"
-import SearchBar from "@/components/molecules/SearchBar"
-import Badge from "@/components/atoms/Badge"
-import ApperIcon from "@/components/ApperIcon"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import cropService from "@/services/api/cropService"
-import farmService from "@/services/api/farmService"
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { AnimatePresence, motion } from "framer-motion";
+import cropService from "@/services/api/cropService";
+import farmService from "@/services/api/farmService";
+import ApperIcon from "@/components/ApperIcon";
+import SearchBar from "@/components/molecules/SearchBar";
+import FormField from "@/components/molecules/FormField";
+import CropTable from "@/components/organisms/CropTable";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Select from "@/components/atoms/Select";
 
 const Crops = () => {
   const [crops, setCrops] = useState([])
@@ -22,8 +23,9 @@ const [showForm, setShowForm] = useState(false)
   const [editingCrop, setEditingCrop] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(50)
+const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(20)
+  const [totalItems, setTotalItems] = useState(0)
   const [formData, setFormData] = useState({
     farmId: "",
     name: "",
@@ -154,23 +156,47 @@ setFormData({
     setEditingCrop(null)
     setShowForm(false)
   }
-const filteredCrops = crops.filter(crop => {
-const matchesSearch = crop.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         crop.variety?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         crop.farmName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || crop.status === statusFilter
+// Server-side pagination logic
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+  // Update loadData to handle pagination
+  const loadDataWithPagination = useCallback(async (page = 1) => {
+    setLoading(true)
+    try {
+      const result = await cropService.getAll(page, itemsPerPage)
+      setCrops(result.data)
+      setTotalItems(result.total)
+    } catch (error) {
+      setError(error.message)
+      toast.error('Failed to load crops')
+    } finally {
+      setLoading(false)
+    }
+  }, [itemsPerPage])
+
+  // Reset to page 1 when filters change and reload data when page changes
+  useEffect(() => {
+    setCurrentPage(1)
+    loadDataWithPagination(1)
+  }, [searchTerm, statusFilter, loadDataWithPagination])
+
+  useEffect(() => {
+    if (currentPage > 1) {
+      loadDataWithPagination(currentPage)
+    }
+  }, [currentPage, loadDataWithPagination])
+
+  // Apply filters to current page data
+  const filteredCrops = crops.filter(crop => {
+    const matchesSearch = !searchTerm || 
+      crop.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      crop.variety?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      crop.farmName?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === 'all' || crop.status === statusFilter
+    
     return matchesSearch && matchesStatus
   })
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredCrops.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedCrops = filteredCrops.slice(startIndex, startIndex + itemsPerPage)
-
-  // Reset to page 1 when filters change
-  React.useEffect(() => {
-    setCurrentPage(1)
-  }, [searchTerm, statusFilter])
   const statusCounts = {
     all: crops.length,
     planted: crops.filter(c => c.status === "planted").length,
@@ -384,13 +410,13 @@ const matchesSearch = crop.Name.toLowerCase().includes(searchTerm.toLowerCase())
         )
       ) : (
 <CropTable
-          crops={paginatedCrops}
+          crops={filteredCrops}
           onEdit={handleEdit}
           onDelete={handleDelete}
           currentPage={currentPage}
           totalPages={totalPages}
           itemsPerPage={itemsPerPage}
-          totalItems={filteredCrops.length}
+          totalItems={totalItems}
           onPageChange={setCurrentPage}
         />
       )}
