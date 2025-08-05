@@ -42,10 +42,11 @@ const Dashboard = () => {
         weatherService.getCurrentWeather()
       ])
 
-      setFarms(farmsData)
-      setCrops(cropsData)
-      setTasks(tasksData)
-      setTransactions(transactionsData)
+// Ensure all data is properly formatted as arrays
+      setFarms(Array.isArray(farmsData) ? farmsData : [])
+      setCrops(Array.isArray(cropsData) ? cropsData : [])
+      setTasks(Array.isArray(tasksData) ? tasksData : [])
+      setTransactions(Array.isArray(transactionsData) ? transactionsData : [])
       setWeather(weatherData)
     } catch (err) {
       setError("Failed to load dashboard data. Please try again.")
