@@ -17,7 +17,7 @@ const SearchBar = ({
         type="text"
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e?.target?.value || '')}
         className="pl-10"
       />
     </div>
