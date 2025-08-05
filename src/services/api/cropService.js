@@ -131,11 +131,10 @@ const cropService = {
   async create(cropData) {
     try {
       // Only include Updateable fields
-      const params = {
+const params = {
         records: [{
           Name: cropData.Name || cropData.name,
           Tags: cropData.Tags || "",
-          Owner: cropData.Owner,
           variety: cropData.variety,
           plantingDate: cropData.plantingDate,
           expectedHarvestDate: cropData.expectedHarvestDate,
@@ -178,13 +177,12 @@ const cropService = {
 
   async update(id, cropData) {
     try {
-      // Only include Updateable fields
+// Only include Updateable fields
       const params = {
         records: [{
           Id: parseInt(id),
           Name: cropData.Name || cropData.name,
           Tags: cropData.Tags || "",
-          Owner: cropData.Owner,
           variety: cropData.variety,
           plantingDate: cropData.plantingDate,
           expectedHarvestDate: cropData.expectedHarvestDate,
@@ -194,7 +192,6 @@ const cropService = {
           farmId: parseInt(cropData.farmId)
         }]
       }
-      
       const response = await apperClient.updateRecord('crop', params)
       
       if (!response.success) {
