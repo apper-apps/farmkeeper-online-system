@@ -114,8 +114,8 @@ const ReadyToHarvest = () => {
 
       {/* Search and Stats */}
       <div className="mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
-        <SearchBar
-          value={searchTerm}
+<SearchBar
+          value={searchTerm || ''}
           onChange={setSearchTerm}
           placeholder="Search crops, varieties, or farms..."
           className="w-full lg:w-96"
