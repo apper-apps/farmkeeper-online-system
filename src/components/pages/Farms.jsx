@@ -249,7 +249,7 @@ return (
 
       {/* Search */}
 {totalItems > 0 && (
-        <SearchBar
+<SearchBar
           value={searchTerm}
           onChange={(value) => setSearchTerm(value)}
           placeholder="Search farms by name or location..."
