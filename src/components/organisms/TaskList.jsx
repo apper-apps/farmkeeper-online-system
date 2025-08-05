@@ -109,6 +109,9 @@ const groupedTasks = tasks.reduce((groups, task) => {
   const statusOrder = ["to do", "in progress", "completed", "overdue"]
 
 if (viewMode === "kanban") {
+    // Note: The defaultProps warning comes from react-beautiful-dnd library's internal Connect(Droppable) component.
+    // This is a known issue with the library not being fully updated for React 18+.
+    // The functionality works correctly - this is just a deprecation warning for future React versions.
     return (
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
