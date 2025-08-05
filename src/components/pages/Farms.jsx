@@ -172,6 +172,18 @@ const handleEdit = (farm) => {
     })
     setShowForm(true)
   }
+
+  const handleViewDetails = (farm) => {
+    const farmDetails = [
+      `Farm: ${farm.Name}`,
+      `Location: ${farm.location}`,
+      `Size: ${farm.size} ${farm.sizeUnit}`,
+      `Active Crops: ${farm.activeCrops || 0}`,
+      `Created: ${new Date(farm.createdAt).toLocaleDateString()}`
+    ].join('\n')
+    
+    alert(`Farm Details:\n\n${farmDetails}`)
+  }
 const handleDelete = async (farm) => {
     if (!window.confirm(`Are you sure you want to delete "${farm.Name}"? This action cannot be undone.`)) {
       return
@@ -325,9 +337,10 @@ return (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredFarms.map((farm) => (
-              <FarmCard
+<FarmCard
                 key={farm.Id}
                 farm={farm}
+                onView={handleViewDetails}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />
