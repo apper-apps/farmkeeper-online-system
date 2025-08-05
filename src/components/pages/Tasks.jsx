@@ -346,9 +346,9 @@ const filteredTasks = tasks.filter(task => {
 
       {/* Search */}
       {tasks.length > 0 && (
-        <SearchBar
+<SearchBar
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(value) => setSearchTerm(value)}
           placeholder="Search tasks by title, farm, or crop..."
           className="max-w-md"
         />
