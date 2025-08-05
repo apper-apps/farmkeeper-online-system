@@ -274,10 +274,10 @@ setFormData({
       )}
 
       {/* Search */}
-      {crops.length > 0 && (
+{crops.length > 0 && (
         <SearchBar
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(value) => setSearchTerm(value)}
           placeholder="Search crops by name, variety, or farm..."
           className="max-w-md"
         />
