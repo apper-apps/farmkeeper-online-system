@@ -23,6 +23,24 @@ async getAll(currentPage = null, itemsPerPage = null) {
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
         ],
+        aggregators: [
+          {
+            id: "activeCropsCount",
+            fields: [
+              {
+                field: { Name: "Id" },
+                Function: "Count"
+              }
+            ],
+            where: [
+              {
+                FieldName: "status",
+                Operator: "NotEqualTo",
+                Values: ["harvested"]
+              }
+            ]
+          }
+        ],
         orderBy: [
           { fieldName: "CreatedOn", sorttype: "DESC" }
         ]
@@ -99,12 +117,11 @@ async create(farmData) {
         records: [
           {
             Name: farmData.name || farmData.Name,
-            Tags: farmData.Tags,
-            Owner: farmData.Owner,
+            Tags: farmData.Tags || "",
             location: farmData.location,
             size: parseFloat(farmData.size),
             sizeUnit: farmData.sizeUnit,
-            createdAt: farmData.createdAt,
+            createdAt: farmData.createdAt || new Date().toISOString(),
             activeCrops: parseInt(farmData.activeCrops) || 0
           }
         ]
@@ -135,8 +152,7 @@ async update(id, farmData) {
           {
             Id: parseInt(id),
             Name: farmData.name || farmData.Name,
-            Tags: farmData.Tags,
-            Owner: farmData.Owner,
+            Tags: farmData.Tags || "",
             location: farmData.location,
             size: parseFloat(farmData.size),
             sizeUnit: farmData.sizeUnit,

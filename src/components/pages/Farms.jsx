@@ -94,7 +94,7 @@ useEffect(() => {
     loadFarms()
   }, [])
 
-  useEffect(() => {
+useEffect(() => {
     loadFarms(currentPage)
   }, [currentPage, itemsPerPage])
 
@@ -114,6 +114,12 @@ useEffect(() => {
     }
   }
 
+  const handleView = (farm) => {
+    // View farm details - you can implement modal or navigation to detail page
+    toast.info(`Viewing details for ${farm.Name}`)
+    // For now, showing a toast. This can be expanded to show a modal or navigate to detail page
+  }
+
   const handlePageChange = (page) => {
     if (page >= 1 && page <= Math.ceil(totalItems / itemsPerPage)) {
       setCurrentPage(page)
@@ -125,7 +131,7 @@ useEffect(() => {
     setCurrentPage(1)
   }
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
     
     if (!formData.name || !formData.location || !formData.size) {
@@ -133,13 +139,14 @@ useEffect(() => {
       return
     }
 
-try {
+    try {
       const farmData = {
         name: formData.name,
         location: formData.location,
         size: parseFloat(formData.size),
         sizeUnit: formData.sizeUnit,
-        createdAt: editingFarm?.createdAt || new Date().toISOString()
+        createdAt: editingFarm?.createdAt || new Date().toISOString(),
+        activeCrops: editingFarm?.activeCrops || 0
       }
 
       if (editingFarm) {
@@ -162,7 +169,7 @@ try {
     }
   }
 
-const handleEdit = (farm) => {
+  const handleEdit = (farm) => {
     setEditingFarm(farm)
     setFormData({
       name: farm.Name,
@@ -172,7 +179,8 @@ const handleEdit = (farm) => {
     })
     setShowForm(true)
   }
-const handleDelete = async (farm) => {
+
+  const handleDelete = async (farm) => {
     if (!window.confirm(`Are you sure you want to delete "${farm.Name}"? This action cannot be undone.`)) {
       return
     }
@@ -324,10 +332,11 @@ return (
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFarms.map((farm) => (
+{filteredFarms.map((farm) => (
               <FarmCard
                 key={farm.Id}
                 farm={farm}
+                onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />
