@@ -18,12 +18,12 @@ const Crops = () => {
   const [farms, setFarms] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [showForm, setShowForm] = useState(false)
+const [showForm, setShowForm] = useState(false)
   const [editingCrop, setEditingCrop] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
+  const [itemsPerPage] = useState(50)
   const [formData, setFormData] = useState({
     farmId: "",
     name: "",
