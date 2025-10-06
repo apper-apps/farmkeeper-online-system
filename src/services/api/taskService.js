@@ -1,5 +1,3 @@
-import React from "react";
-import Error from "@/components/ui/Error";
 const { ApperClient } = window.ApperSDK
 
 const apperClient = new ApperClient({
@@ -10,7 +8,11 @@ const apperClient = new ApperClient({
 const taskService = {
   async getAll() {
     try {
-const params = {
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      const params = {
         fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
@@ -30,7 +32,14 @@ const params = {
             field: { name: "cropId" },
             referenceField: { field: { name: "Name" } }
           }
-        ]
+        ],
+        where: currentUserEmail ? [
+          {
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }
+        ] : []
       }
       
       const response = await apperClient.fetchRecords('task', params)
@@ -54,7 +63,11 @@ const params = {
 
   async getById(id) {
     try {
-const params = {
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      const params = {
         fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
@@ -74,7 +87,14 @@ const params = {
             field: { name: "cropId" },
             referenceField: { field: { name: "Name" } }
           }
-        ]
+        ],
+        where: currentUserEmail ? [
+          {
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }
+        ] : []
       }
       
       const response = await apperClient.getRecordById('task', parseInt(id), params)
@@ -98,7 +118,11 @@ const params = {
 
   async getByFarmId(farmId) {
     try {
-const params = {
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      const params = {
         fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
@@ -118,13 +142,18 @@ const params = {
             field: { name: "cropId" },
             referenceField: { field: { name: "Name" } }
           }
-        ],
+],
         where: [
           {
             FieldName: "farmId",
             Operator: "EqualTo",
             Values: [parseInt(farmId)]
-          }
+          },
+          ...(currentUserEmail ? [{
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }] : [])
         ]
       }
       
@@ -149,7 +178,11 @@ const params = {
 
   async getByCropId(cropId) {
     try {
-const params = {
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      const params = {
         fields: [
           { field: { name: "Name" } },
           { field: { name: "Tags" } },
@@ -169,13 +202,23 @@ const params = {
             field: { name: "cropId" },
             referenceField: { field: { name: "Name" } }
           }
-        ],
+],
         where: [
           {
             FieldName: "cropId",
             Operator: "EqualTo",
             Values: [parseInt(cropId)]
-          }
+          },
+          {
+            FieldName: "completed",
+            Operator: "EqualTo",
+            Values: [false]
+          },
+          ...(currentUserEmail ? [{
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }] : [])
         ]
       }
       
@@ -201,11 +244,15 @@ const params = {
 async create(taskData) {
     try {
 // Only include Updateable fields - validate record exists before update
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         records: [{
           Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
-          Owner: taskData.Owner?.Id || (taskData.Owner ? parseInt(taskData.Owner) : null),
+          Owner: currentUserEmail,
           title: taskData.title,
           type: taskData.type || "other",
           dueDate: taskData.dueDate,
@@ -251,16 +298,25 @@ async create(taskData) {
 async update(id, taskData) {
     try {
 // Only include Updateable fields - ensure proper field validation
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      // Verify ownership before updating
+      const existingTask = await this.getById(id);
+      if (existingTask.Owner !== currentUserEmail) {
+        throw new Error("You don't have permission to update this task");
+      }
+      
       const params = {
         records: [{
           Id: parseInt(id),
           Name: taskData.Name || taskData.title,
           Tags: taskData.Tags || "",
-          Owner: taskData.Owner?.Id || (taskData.Owner ? parseInt(taskData.Owner) : null),
           title: taskData.title,
-type: taskData.type,
+          type: taskData.type,
           dueDate: taskData.dueDate,
-completed: taskData.completed,
+          completed: taskData.completed,
           priority: taskData.priority,
           status: taskData.status,
           notes: taskData.notes || "",
@@ -301,7 +357,17 @@ completed: taskData.completed,
   },
 
   async delete(id) {
-    try {
+try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      // Verify ownership before deleting
+      const existingTask = await this.getById(id);
+      if (existingTask.Owner !== currentUserEmail) {
+        throw new Error("You don't have permission to delete this task");
+      }
+      
       const params = {
         RecordIds: [parseInt(id)]
       }

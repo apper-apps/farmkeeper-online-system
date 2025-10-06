@@ -6,3 +6,8 @@ export const store = configureStore({
     user: userReducer,
   },
 })
+
+// Make store globally available for services
+if (typeof window !== 'undefined') {
+  window.store = store;
+}

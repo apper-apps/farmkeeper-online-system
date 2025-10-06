@@ -8,6 +8,10 @@ const apperClient = new ApperClient({
 const farmService = {
 async getAll(currentPage = null, itemsPerPage = null) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -23,6 +27,13 @@ async getAll(currentPage = null, itemsPerPage = null) {
           { field: { Name: "createdAt" } },
           { field: { Name: "activeCrops" } }
         ],
+        where: currentUserEmail ? [
+          {
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }
+        ] : [],
         orderBy: [
           { fieldName: "CreatedOn", sorttype: "DESC" }
         ]
@@ -65,8 +76,12 @@ async getAll(currentPage = null, itemsPerPage = null) {
     }
   },
 
-  async getById(id) {
+async getById(id) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -95,6 +110,10 @@ async getAll(currentPage = null, itemsPerPage = null) {
 
 async create(farmData) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       // Calculate active crops count (new farms start with 0 active crops)
       let activeCropsCount = 0;
 
@@ -103,7 +122,7 @@ async create(farmData) {
           {
             Name: farmData.name || farmData.Name,
             Tags: farmData.Tags,
-            Owner: farmData.Owner,
+            Owner: currentUserEmail,
             location: farmData.location,
             size: parseFloat(farmData.size),
             sizeUnit: farmData.sizeUnit,
@@ -133,6 +152,16 @@ async create(farmData) {
 
 async update(id, farmData) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      // Verify ownership before updating
+      const existingFarm = await this.getById(id);
+      if (existingFarm.Owner !== currentUserEmail) {
+        throw new Error("You don't have permission to update this farm");
+      }
+      
       // Calculate active crops count by querying crop records
       let activeCropsCount = 0;
       
@@ -198,8 +227,18 @@ async update(id, farmData) {
     }
   },
 
-  async delete(id) {
+async delete(id) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      // Verify ownership before deleting
+      const existingFarm = await this.getById(id);
+      if (existingFarm.Owner !== currentUserEmail) {
+        throw new Error("You don't have permission to delete this farm");
+      }
+      
       const params = {
         RecordIds: [parseInt(id)]
       }

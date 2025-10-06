@@ -6,8 +6,12 @@ const apperClient = new ApperClient({
 })
 
 const cropService = {
-  async getAll(page = 1, limit = 20) {
+async getAll(page = 1, limit = 20) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -21,6 +25,13 @@ const cropService = {
           { field: { Name: "notes" } },
           { field: { Name: "farmId" } }
         ],
+        where: currentUserEmail ? [
+          {
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }
+        ] : [],
         pagingInfo: {
           limit: limit,
           offset: (page - 1) * limit
@@ -50,7 +61,11 @@ const cropService = {
   },
 
   async getById(id) {
-    try {
+try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -63,7 +78,14 @@ const cropService = {
           { field: { Name: "area" } },
           { field: { Name: "notes" } },
           { field: { Name: "farmId" } }
-        ]
+        ],
+        where: currentUserEmail ? [
+          {
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }
+        ] : []
       }
       
       const response = await apperClient.getRecordById('crop', parseInt(id), params)
@@ -87,6 +109,10 @@ const cropService = {
 
   async getByFarmId(farmId) {
     try {
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -100,12 +126,17 @@ const cropService = {
           { field: { Name: "notes" } },
           { field: { Name: "farmId" } }
         ],
-        where: [
+where: [
           {
             FieldName: "farmId",
             Operator: "EqualTo",
             Values: [parseInt(farmId)]
-          }
+          },
+          ...(currentUserEmail ? [{
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }] : [])
         ]
       }
       
@@ -131,10 +162,15 @@ const cropService = {
   async create(cropData) {
     try {
       // Only include Updateable fields
-const params = {
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      const params = {
         records: [{
           Name: cropData.Name || cropData.name,
           Tags: cropData.Tags || "",
+          Owner: currentUserEmail,
           variety: cropData.variety,
           plantingDate: cropData.plantingDate,
           expectedHarvestDate: cropData.expectedHarvestDate,
@@ -178,6 +214,16 @@ const params = {
   async update(id, cropData) {
     try {
 // Only include Updateable fields
+// Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      // Verify ownership before updating
+      const existingCrop = await this.getById(id);
+      if (existingCrop.Owner !== currentUserEmail) {
+        throw new Error("You don't have permission to update this crop");
+      }
+      
       const params = {
         records: [{
           Id: parseInt(id),
@@ -223,7 +269,17 @@ const params = {
   },
 
   async delete(id) {
-    try {
+try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
+      // Verify ownership before deleting
+      const existingCrop = await this.getById(id);
+      if (existingCrop.Owner !== currentUserEmail) {
+        throw new Error("You don't have permission to delete this crop");
+      }
+      
       const params = {
         RecordIds: [parseInt(id)]
       }
@@ -257,7 +313,11 @@ const params = {
 },
 
   async getReadyToHarvest(page = 1, limit = 20) {
-    try {
+try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -271,12 +331,17 @@ const params = {
           { field: { Name: "notes" } },
           { field: { Name: "farmId" } }
         ],
-        where: [
+where: [
           {
             FieldName: "status",
             Operator: "EqualTo",
             Values: ["ready"]
-          }
+          },
+          ...(currentUserEmail ? [{
+            FieldName: "Owner",
+            Operator: "EqualTo",
+            Values: [currentUserEmail]
+          }] : [])
         ],
         pagingInfo: {
           limit: limit,

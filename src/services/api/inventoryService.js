@@ -13,8 +13,12 @@ class InventoryService {
     }
   }
 
-  async getAll(filters = {}) {
+async getAll(filters = {}) {
     try {
+      // Get current user from Redux store
+      const state = window.store.getState();
+      const currentUserEmail = state.user?.user?.emailAddress;
+      
       const params = {
         fields: [
           { field: { Name: "Name" } },
@@ -38,6 +42,16 @@ class InventoryService {
           offset: filters.offset || 0
         }
       };
+
+      // Add owner filter
+      const whereConditions = [];
+      if (currentUserEmail) {
+        whereConditions.push({
+          FieldName: "Owner",
+          Operator: "EqualTo",
+          Values: [currentUserEmail]
+        });
+      }
 
       // Add search filter if provided
       if (filters.search) {
@@ -70,18 +84,15 @@ class InventoryService {
 
       // Add type filter if provided
       if (filters.type && filters.type !== 'all') {
-        const typeFilter = {
+        whereConditions.push({
           FieldName: "type",
           Operator: "EqualTo",
           Values: [filters.type]
-        };
-        
-        if (params.whereGroups) {
-          // Add type filter as AND condition with existing search
-          params.where = [typeFilter];
-        } else {
-          params.where = [typeFilter];
-        }
+        });
+      }
+      
+      if (whereConditions.length > 0) {
+        params.where = whereConditions;
       }
 
       const response = await this.apperClient.fetchRecords(this.tableName, params);
