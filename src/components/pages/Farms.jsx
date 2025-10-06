@@ -91,11 +91,11 @@ const [farms, setFarms] = useState([])
     sizeUnit: "acres"
   })
 useEffect(() => {
-    loadFarms()
+    loadFarms(currentPage, itemsPerPage)
   }, [])
 
   useEffect(() => {
-    loadFarms(currentPage)
+    loadFarms(currentPage, itemsPerPage)
   }, [currentPage, itemsPerPage])
 
   const loadFarms = async (page = 1) => {

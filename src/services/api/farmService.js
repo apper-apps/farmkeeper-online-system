@@ -6,7 +6,7 @@ const apperClient = new ApperClient({
 })
 
 const farmService = {
-async getAll(currentPage = null, itemsPerPage = null) {
+async getAll(currentPage = 1, itemsPerPage = 20) {
     try {
       // Get current user from Redux store
       const state = window.store.getState();
@@ -40,10 +40,10 @@ async getAll(currentPage = null, itemsPerPage = null) {
       }
 
       // Add pagination if requested
-      if (currentPage && itemsPerPage) {
+if (currentPage > 0 && itemsPerPage > 0) {
         params.pagingInfo = {
-          limit: itemsPerPage,
-          offset: (currentPage - 1) * itemsPerPage
+          limit: parseInt(itemsPerPage),
+          offset: (parseInt(currentPage) - 1) * parseInt(itemsPerPage)
         }
       }
 
